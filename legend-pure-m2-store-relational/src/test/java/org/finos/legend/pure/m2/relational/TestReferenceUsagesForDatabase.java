@@ -19,7 +19,7 @@ import org.eclipse.collections.api.block.predicate.Predicate;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.ReferenceUsage;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Database;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Database;
 import org.finos.legend.pure.m3.serialization.runtime.PureRuntime;
 import org.finos.legend.pure.m4.coreinstance.SourceInformation;
 import org.junit.Assert;

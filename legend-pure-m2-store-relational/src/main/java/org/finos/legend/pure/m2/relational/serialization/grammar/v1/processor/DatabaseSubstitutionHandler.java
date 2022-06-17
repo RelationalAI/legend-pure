@@ -22,8 +22,8 @@ import org.finos.legend.pure.m3.navigation.PackageableElement.PackageableElement
 import org.finos.legend.pure.m3.coreinstance.meta.pure.mapping.Mapping;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.mapping.MappingInclude;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.mapping.SubstituteStore;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.mapping.RootRelationalInstanceSetImplementation;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Database;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.mapping.RootRelationalInstanceSetImplementation;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Database;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
 
 class DatabaseSubstitutionHandler

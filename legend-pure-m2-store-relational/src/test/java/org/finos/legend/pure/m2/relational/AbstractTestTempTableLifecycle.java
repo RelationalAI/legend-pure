@@ -33,14 +33,14 @@ public abstract class AbstractTestTempTableLifecycle extends AbstractPureTestWit
         exception.expectMessage("Table \"TT\" not found");
 
         compileTestSource(
-                "import meta::relational::runtime::*;\n" +
-                        "import meta::relational::metamodel::*;\n" +
-                        "import meta::relational::metamodel::execute::*;" +
-                        "import meta::relational::functions::toDDL::*;" +
+                "import meta::external::store::relational::runtime::*;\n" +
+                        "import meta::external::store::relational::metamodel::*;\n" +
+                        "import meta::external::store::relational::metamodel::execute::*;" +
+                        "import meta::external::store::relational::functions::toDDL::*;" +
                         "function test():Any[0..1]\n" +
                         "{\n" +
                         "   let dbConnection = ^TestDatabaseConnection(element = mydb, type = DatabaseType.H2);" +
-                        "   createTempTable('tt', ^Column(name='col', type=^meta::relational::metamodel::datatype::Integer()), " +
+                        "   createTempTable('tt', ^Column(name='col', type=^meta::external::store::relational::metamodel::datatype::Integer()), " +
                         "                   {ttName:String[1], cols: Column[*], dbType: DatabaseType[1]| 'Create LOCAL TEMPORARY TABLE tt (col INT)'}, " +
                         "                   $dbConnection);" +
                         "   let res = executeInDb('select * from tt', $dbConnection, 0, 1000);" +
@@ -72,13 +72,13 @@ public abstract class AbstractTestTempTableLifecycle extends AbstractPureTestWit
         exception.expectMessage("Temporary table: tt should be dropped explicitly");
 
         compileTestSource(
-                "import meta::relational::runtime::*;\n" +
-                        "import meta::relational::metamodel::*;\n" +
-                        "import meta::relational::metamodel::execute::*;" +
+                "import meta::external::store::relational::runtime::*;\n" +
+                        "import meta::external::store::relational::metamodel::*;\n" +
+                        "import meta::external::store::relational::metamodel::execute::*;" +
                         "function test():Any[0..1]\n" +
                         "{\n" +
                         "   let dbConnection = ^TestDatabaseConnection(element = mydb, type = DatabaseType.H2);" +
-                        "   createTempTable('tt', ^Column(name='col', type=^meta::relational::metamodel::datatype::Integer()), " +
+                        "   createTempTable('tt', ^Column(name='col', type=^meta::external::store::relational::metamodel::datatype::Integer()), " +
                         "   {ttName:String[1], cols: Column[*], dbType: DatabaseType[1]| 'Create LOCAL TEMPORARY TABLE tt (col INT)'}, " +
                         "   $dbConnection);" +
                         "   let res = executeInDb('select * from tt', $dbConnection, 0, 1000);" +
@@ -105,13 +105,13 @@ public abstract class AbstractTestTempTableLifecycle extends AbstractPureTestWit
     public void testRelyOnFinallyTempTableFlow()
     {
         compileTestSource(
-                "import meta::relational::runtime::*;\n" +
-                        "import meta::relational::metamodel::*;\n" +
-                        "import meta::relational::metamodel::execute::*;" +
+                "import meta::external::store::relational::runtime::*;\n" +
+                        "import meta::external::store::relational::metamodel::*;\n" +
+                        "import meta::external::store::relational::metamodel::execute::*;" +
                         "function test():Any[0..1]\n" +
                         "{\n" +
                         "   let dbConnection = ^TestDatabaseConnection(element = mydb, type = DatabaseType.H2);" +
-                        "   createTempTable('tt', ^Column(name='col', type=^meta::relational::metamodel::datatype::Integer()), " +
+                        "   createTempTable('tt', ^Column(name='col', type=^meta::external::store::relational::metamodel::datatype::Integer()), " +
                         "   {ttName:String[1], cols: Column[*], dbType: DatabaseType[1]| 'Create LOCAL TEMPORARY TABLE tt (col INT)'}, true," +
                         "   $dbConnection);" +
                         "   let res = executeInDb('select * from tt', $dbConnection, 0, 1000);" +

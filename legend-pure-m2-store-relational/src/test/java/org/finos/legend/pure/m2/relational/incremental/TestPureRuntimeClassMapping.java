@@ -477,7 +477,7 @@ public class TestPureRuntimeClassMapping extends AbstractPureRelationalTestWithC
                 "   id:Integer[1];\n" +
                 "}";
         String storeAndMapping = "###Mapping\n" +
-                "import meta::relational::tests::*;\n" +
+                "import meta::external::store::relational::tests::*;\n" +
                 "import my::*;\n" +
                 "\n" +
                 "Mapping myMapping\n" +

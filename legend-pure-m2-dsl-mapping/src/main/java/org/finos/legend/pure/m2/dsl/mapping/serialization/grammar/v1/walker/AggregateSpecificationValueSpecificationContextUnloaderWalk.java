@@ -16,7 +16,7 @@ package org.finos.legend.pure.m2.dsl.mapping.serialization.grammar.v1.walker;
 
 import org.finos.legend.pure.m2.dsl.mapping.M2MappingPaths;
 import org.finos.legend.pure.m3.compiler.Context;
-import org.finos.legend.pure.m3.coreinstance.meta.pure.mapping.aggregationAware.AggregateSpecificationValueSpecificationContext;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.aggregationAware.AggregateSpecificationValueSpecificationContext;
 import org.finos.legend.pure.m3.tools.matcher.MatchRunner;
 import org.finos.legend.pure.m3.tools.matcher.Matcher;
 import org.finos.legend.pure.m3.tools.matcher.MatcherState;

@@ -14,15 +14,15 @@
 
 import meta::pure::runtime::*;
 import meta::pure::mapping::*;
-import meta::relational::runtime::*;
-import meta::relational::metamodel::relation::*;
+import meta::external::store::relational::runtime::*;
+import meta::external::store::relational::metamodel::relation::*;
 
-Enum meta::relational::runtime::DatabaseType
+Enum meta::external::store::relational::runtime::DatabaseType
 {
    DB2, H2, MemSQL, Sybase, SybaseIQ, Composite, Postgres, SqlServer, Hive, Snowflake, Presto, BigQuery, Redshift, Databricks
 }
 
-Class meta::relational::runtime::DatabaseConnection extends Connection
+Class meta::external::store::relational::runtime::DatabaseConnection extends Connection
 {
    type : DatabaseType[1];
    debug : Boolean[0..1];
@@ -42,19 +42,19 @@ Class meta::relational::runtime::DatabaseConnection extends Connection
    queryPostProcessorsWithParameter: PostProcessorWithParameter[*];
 }
 
-Class meta::relational::runtime::PostProcessorWithParameter
+Class meta::external::store::relational::runtime::PostProcessorWithParameter
 {
    postProcessor: ConcreteFunctionDefinition<{->PostProcessor[1]}>[1];
 
    parameters: PostProcessorParameter[*];
 }
 
-Class meta::relational::runtime::PostProcessorParameter
+Class meta::external::store::relational::runtime::PostProcessorParameter
 {
 
 }
 
-Class meta::relational::runtime::PostProcessor
+Class meta::external::store::relational::runtime::PostProcessor
 {
    {doc.doc= 'Pure Execution flow'}
    sqlQueryPostProcessorForExecution: Function<Any>[0..1];
@@ -72,7 +72,7 @@ Class meta::relational::runtime::PostProcessor
 
 }
 
-Class meta::relational::runtime::PostProcessors
+Class meta::external::store::relational::runtime::PostProcessors
 {
    {doc.doc= 'Pure Execution flow'}
    sqlQueryPostProcessor: Function<Any>[0..1];
@@ -92,7 +92,7 @@ Class meta::relational::runtime::PostProcessors
 
 }
 
-Class meta::relational::runtime::TestDatabaseConnection extends DatabaseConnection
+Class meta::external::store::relational::runtime::TestDatabaseConnection extends DatabaseConnection
 {
     {doc.doc = 'This is used to generate SQL from the test data.'}
     testDataSetupCsv : String[0..1];
@@ -112,10 +112,10 @@ Class meta::relational::runtime::TestDatabaseConnection extends DatabaseConnecti
     testDataSetupSqls : String[*];
 
     {doc.doc = 'testDataSchemas field should never be populated manually. This is used exclusively in Legend Engine'}
-    testDataSchemas : meta::relational::metamodel::Schema[*];
+    testDataSchemas : meta::external::store::relational::metamodel::Schema[*];
 }
 
-Class meta::relational::runtime::DataSource
+Class meta::external::store::relational::runtime::DataSource
 {
     host : String[1];
     port : Integer[1];

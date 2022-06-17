@@ -29,7 +29,7 @@ import org.eclipse.collections.impl.list.mutable.FastList;
 
 public class ColumnDataTypeFactory
 {
-    private static final String DATA_TYPE_ROOT_PACKAGE = "meta::relational::metamodel::datatype::";
+    private static final String DATA_TYPE_ROOT_PACKAGE = "meta::external::store::relational::metamodel::datatype::";
     private static final ImmutableMap<String, String> COLUMN_TYPE_MAP = buildTypeMap();
     private static final ImmutableMap<String, ImmutableList<String>> TYPE_PARAM_MAP = pureDataTypeConstructorParameterMap();
 

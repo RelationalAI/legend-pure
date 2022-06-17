@@ -86,7 +86,7 @@ public class LogActivities extends NativeFunction
             @Override
             public boolean accept(CoreInstance coreInstance)
             {
-                return Instance.instanceOf(coreInstance, "meta::relational::mapping::RelationalActivity", processorSupport);
+                return Instance.instanceOf(coreInstance, "meta::external::store::relational::mapping::RelationalActivity", processorSupport);
             }
         }).forEach(new Procedure<CoreInstance>()
         {

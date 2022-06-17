@@ -14,7 +14,7 @@
 
 package org.finos.legend.pure.runtime.java.extension.store.relational.compiled.natives;
 
-import org.finos.legend.pure.m3.coreinstance.meta.relational.runtime.DatabaseConnection;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.runtime.DatabaseConnection;
 import org.finos.legend.pure.m3.execution.ExecutionSupport;
 import org.finos.legend.pure.m4.coreinstance.SourceInformation;
 import org.finos.legend.pure.runtime.java.compiled.generation.processors.natives.AbstractNativeFunctionGeneric;

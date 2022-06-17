@@ -50,15 +50,15 @@ public abstract class AbstractFetchDbMetadata extends NativeFunction
 
     protected CoreInstance loadDatabaseMetaData(CoreInstance connectionInformation, CoreInstance functionExpressionToUseInStack, ProcessorSupport processorSupport, SqlFunction<DatabaseMetaData, ResultSet> databaseMetadataFunction)
     {
-        CoreInstance resultSetClassifier = processorSupport.package_getByUserPath("meta::relational::metamodel::execute::ResultSet");
+        CoreInstance resultSetClassifier = processorSupport.package_getByUserPath("meta::external::store::relational::metamodel::execute::ResultSet");
         if (resultSetClassifier == null)
         {
-            throw new RuntimeException("'meta::relational::metamodel::execute::ResultSet' is unknown");
+            throw new RuntimeException("'meta::external::store::relational::metamodel::execute::ResultSet' is unknown");
         }
-        CoreInstance rowClassifier = processorSupport.package_getByUserPath("meta::relational::metamodel::execute::Row");
+        CoreInstance rowClassifier = processorSupport.package_getByUserPath("meta::external::store::relational::metamodel::execute::Row");
         if (rowClassifier == null)
         {
-            throw new RuntimeException("'meta::relational::metamodel::execute::Row' is unknown");
+            throw new RuntimeException("'meta::external::store::relational::metamodel::execute::Row' is unknown");
         }
 
         CoreInstance pureResult = this.repository.newAnonymousCoreInstance(functionExpressionToUseInStack.getSourceInformation(), resultSetClassifier);
@@ -94,7 +94,7 @@ public abstract class AbstractFetchDbMetadata extends NativeFunction
 
                 if (dbType != null && dbHost != null && dbName != null && dbPort != null)
                 {
-                    CoreInstance dataSourceCoreInstance = repository.newEphemeralAnonymousCoreInstance(null, processorSupport.package_getByUserPath("meta::relational::runtime::DataSource"));
+                    CoreInstance dataSourceCoreInstance = repository.newEphemeralAnonymousCoreInstance(null, processorSupport.package_getByUserPath("meta::external::store::relational::runtime::DataSource"));
 
                     Instance.addValueToProperty(dataSourceCoreInstance, "host", repository.newStringCoreInstance(dbHost), processorSupport);
                     Instance.addValueToProperty(dataSourceCoreInstance, "port", repository.newIntegerCoreInstance(dbPort), processorSupport);

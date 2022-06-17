@@ -101,13 +101,13 @@ public class TestMilestoningClassProcessor extends AbstractTestMilestoning
     @Test
     public void testConflictingStereotypesOnParent()
     {
-        String domain = "Class <<temporal.businesstemporal>> meta::relational::tests::milestoning::Product{}\n" +
-                "Class <<temporal.processingtemporal>> meta::relational::tests::milestoning::Instrument{}\n" +
-                "Class <<temporal.processingtemporal>> meta::relational::tests::milestoning::Stock extends meta::relational::tests::milestoning::Product, meta::relational::tests::milestoning::Instrument{}";
+        String domain = "Class <<temporal.businesstemporal>> meta::external::store::relational::tests::milestoning::Product{}\n" +
+                "Class <<temporal.processingtemporal>> meta::external::store::relational::tests::milestoning::Instrument{}\n" +
+                "Class <<temporal.processingtemporal>> meta::external::store::relational::tests::milestoning::Stock extends meta::external::store::relational::tests::milestoning::Product, meta::external::store::relational::tests::milestoning::Instrument{}";
 
         runtime.createInMemorySource("domain.pure", domain);
         PureCompilationException e = Assert.assertThrows(PureCompilationException.class, runtime::compile);
-        Assert.assertEquals("Compilation error at (resource:domain.pure line:3 column:77), \"A Type may only have one Temporal Stereotype, 'meta::relational::tests::milestoning::Stock' has [businesstemporal, processingtemporal]\"", e.getMessage());
+        Assert.assertEquals("Compilation error at (resource:domain.pure line:3 column:94), \"A Type may only have one Temporal Stereotype, 'meta::external::store::relational::tests::milestoning::Stock' has [businesstemporal, processingtemporal]\"", e.getMessage());
     }
 
     @Test

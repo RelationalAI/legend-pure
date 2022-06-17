@@ -315,7 +315,7 @@ public class TestMilestoningPropertyProcessor extends AbstractTestMilestoning
                         "}\n" +
                         "Class <<temporal.businesstemporal>> meta::test::domain::Product{\n" +
                         "}" +
-                        "Association meta::relational::tests::milestoning::OrderProduct{\n" +
+                        "Association meta::external::store::relational::tests::milestoning::OrderProduct{\n" +
                         "   product : Product[1];\n" +
                         "   orders : Order[*];\n" +
                         "}"
@@ -682,13 +682,13 @@ public class TestMilestoningPropertyProcessor extends AbstractTestMilestoning
         runtime.createInMemorySource("sourceId.pure",
                 "import model::domain::subdom1::entity::*;" +
                         "import model::domain::subdom1::product::*;" +
-                        "Class <<temporal.businesstemporal>> meta::relational::tests::milestoning::inheritance::VehicleOwner \n" +
+                        "Class <<temporal.businesstemporal>> meta::external::store::relational::tests::milestoning::inheritance::VehicleOwner \n" +
                         "{" +
-                        "vehicles : meta::relational::tests::milestoning::inheritance::Vehicle[*];" +
+                        "vehicles : meta::external::store::relational::tests::milestoning::inheritance::Vehicle[*];" +
                         "}" +
-                        "Class <<temporal.businesstemporal>> meta::relational::tests::milestoning::inheritance::Person extends meta::relational::tests::milestoning::inheritance::VehicleOwner \n" +
+                        "Class <<temporal.businesstemporal>> meta::external::store::relational::tests::milestoning::inheritance::Person extends meta::external::store::relational::tests::milestoning::inheritance::VehicleOwner \n" +
                         "{}" +
-                        "Class <<temporal.businesstemporal>> meta::relational::tests::milestoning::inheritance::Vehicle\n" +
+                        "Class <<temporal.businesstemporal>> meta::external::store::relational::tests::milestoning::inheritance::Vehicle\n" +
                         "{\n" +
                         "   id : Integer[1];\n" +
                         "   description: String[1];\n" +
@@ -711,14 +711,14 @@ public class TestMilestoningPropertyProcessor extends AbstractTestMilestoning
                         "}\n" +
                         "Class <<temporal.businesstemporal>> meta::test::domain::Product{\n" +
                         "}" +
-                        "Association meta::relational::tests::milestoning::OrderProduct{\n" +
+                        "Association meta::external::store::relational::tests::milestoning::OrderProduct{\n" +
                         "   assocProduct : Product[1];\n" +
                         "   orders : Order[*];\n" +
                         "}"
         );
         runtime.createInMemorySource("sourceId2.pure",
                 "import meta::test::domain::*;" +
-                        "Association meta::relational::tests::milestoning::OrderProduct2{\n" +
+                        "Association meta::external::store::relational::tests::milestoning::OrderProduct2{\n" +
                         "   assocProduct2 : Product[1];\n" +
                         "   orders2 : Order[*];\n" +
                         "}"
@@ -726,7 +726,7 @@ public class TestMilestoningPropertyProcessor extends AbstractTestMilestoning
         runtime.compile();
 
         //test Association
-        CoreInstance assn = runtime.getCoreInstance("meta::relational::tests::milestoning::OrderProduct");
+        CoreInstance assn = runtime.getCoreInstance("meta::external::store::relational::tests::milestoning::OrderProduct");
         ListIterable<? extends CoreInstance> assnProperties = Instance.getValueForMetaPropertyToManyResolved(assn, M3Properties.properties, processorSupport);
         Verify.assertSize(2, assnProperties);
         Verify.assertContainsAll(assnProperties.collect(CoreInstance::getName), "orders", "assocProductAllVersions");
@@ -985,17 +985,17 @@ public class TestMilestoningPropertyProcessor extends AbstractTestMilestoning
     @Test
     public void testPropertyConflictsExistingPropertiesVsGeneratedProperties()
     {
-        String domain = "import meta::relational::tests::milestoning::*;" +
-                "Class <<temporal.bitemporal>> meta::relational::tests::milestoning::Order { other(s:String[1]){'other'}:String[1]; \n" +
+        String domain = "import meta::external::store::relational::tests::milestoning::*;" +
+                "Class <<temporal.bitemporal>> meta::external::store::relational::tests::milestoning::Order { other(s:String[1]){'other'}:String[1]; \n" +
                 "                                                                            other2(s:String[1]){'other'}:String[1];" +
                 "                                                                                    createdLocation : Location[*]; \n" +
                 "                                                                            createdLocation(processingDate:Date[1], businessDate:Date[1], s:String[1]){$this.createdLocation(%latest, %latest)}: Location[*]; }\n";
-        String domain2 = "Class <<temporal.bitemporal>> meta::relational::tests::milestoning::Location{ place : String[1];}";
+        String domain2 = "Class <<temporal.bitemporal>> meta::external::store::relational::tests::milestoning::Location{ place : String[1];}";
 
         runtime.createInMemorySource("domain.pure", domain);
         runtime.createInMemorySource("domain2.pure", domain2);
         runtime.compile();
-        CoreInstance order = runtime.getCoreInstance("meta::relational::tests::milestoning::Order");
+        CoreInstance order = runtime.getCoreInstance("meta::external::store::relational::tests::milestoning::Order");
         ListIterable<? extends CoreInstance> orderQps = Instance.getValueForMetaPropertyToManyResolved(order, M3Properties.qualifiedProperties, processorSupport);
         ListMultimap<String, ? extends CoreInstance> qualifiedPropertiesByName = orderQps.groupBy(CoreInstance::getName);
 
@@ -1005,43 +1005,43 @@ public class TestMilestoningPropertyProcessor extends AbstractTestMilestoning
     @Test
     public void testBiTemporalPropertyGeneration()
     {
-        String domain = "import meta::relational::tests::milestoning::*;" +
-                "Class meta::relational::tests::milestoning::Order { createdLocation : Location[0..1]; }\n" +
-                "Class <<temporal.bitemporal>> meta::relational::tests::milestoning::Exchange { basedIn : Location[0..1]; }\n" +
-                "Class <<temporal.businesstemporal>> meta::relational::tests::milestoning::LegalEntity {}\n" +
-                "Class <<temporal.processingtemporal>> meta::relational::tests::milestoning::LegalEntityPt {}\n" +
-                "Class <<temporal.bitemporal>> meta::relational::tests::milestoning::Location{ place : String[1];}" +
+        String domain = "import meta::external::store::relational::tests::milestoning::*;" +
+                "Class meta::external::store::relational::tests::milestoning::Order { createdLocation : Location[0..1]; }\n" +
+                "Class <<temporal.bitemporal>> meta::external::store::relational::tests::milestoning::Exchange { basedIn : Location[0..1]; }\n" +
+                "Class <<temporal.businesstemporal>> meta::external::store::relational::tests::milestoning::LegalEntity {}\n" +
+                "Class <<temporal.processingtemporal>> meta::external::store::relational::tests::milestoning::LegalEntityPt {}\n" +
+                "Class <<temporal.bitemporal>> meta::external::store::relational::tests::milestoning::Location{ place : String[1];}" +
                 "Association LegalEntity_Location{ registeredIn : Location[0..1]; legalEntity: LegalEntity[0..1]; }" +
                 "Association LegalEntityPt_Location{ registeredInPt : Location[0..1]; legalEntityPt: LegalEntityPt[0..1]; }";
 
         runtime.createInMemorySource("domain.pure", domain);
         runtime.compile();
-        CoreInstance order = runtime.getCoreInstance("meta::relational::tests::milestoning::Order");
+        CoreInstance order = runtime.getCoreInstance("meta::external::store::relational::tests::milestoning::Order");
         ListIterable<? extends CoreInstance> orderQps = Instance.getValueForMetaPropertyToManyResolved(order, M3Properties.qualifiedProperties, processorSupport);
         Assert.assertEquals(1, orderQps.size());
         assertMilestoningQualifiedProperty(orderQps.getFirst(), "createdLocation", "Location", "0..1", 2);
 
-        CoreInstance exchange = runtime.getCoreInstance("meta::relational::tests::milestoning::Exchange");
+        CoreInstance exchange = runtime.getCoreInstance("meta::external::store::relational::tests::milestoning::Exchange");
         ListIterable<? extends CoreInstance> exchangeQps = Instance.getValueForMetaPropertyToManyResolved(exchange, M3Properties.qualifiedProperties, processorSupport);
         Assert.assertEquals(3, exchangeQps.size());
         assertMilestoningQualifiedProperty(exchangeQps.get(0), "basedIn", "Location", "0..1", 2);
         assertMilestoningQualifiedProperty(exchangeQps.get(1), "basedIn", "Location", "0..1", 1);
         assertMilestoningQualifiedProperty(exchangeQps.get(2), "basedIn", "Location", "0..1", 0);
 
-        CoreInstance legalEntity = runtime.getCoreInstance("meta::relational::tests::milestoning::LegalEntity");
+        CoreInstance legalEntity = runtime.getCoreInstance("meta::external::store::relational::tests::milestoning::LegalEntity");
         ListIterable<? extends CoreInstance> legalEntityQps = Instance.getValueForMetaPropertyToManyResolved(legalEntity, M3Properties.qualifiedPropertiesFromAssociations, processorSupport);
         Assert.assertEquals(2, legalEntityQps.size());
         assertMilestoningQualifiedProperty(legalEntityQps.get(0), "registeredIn", "Location", "0..1", 2);
         assertMilestoningQualifiedProperty(legalEntityQps.get(1), "registeredIn", "Location", "0..1", 1);
 
-        CoreInstance legalEntityPt = runtime.getCoreInstance("meta::relational::tests::milestoning::LegalEntityPt");
+        CoreInstance legalEntityPt = runtime.getCoreInstance("meta::external::store::relational::tests::milestoning::LegalEntityPt");
         ListIterable<? extends CoreInstance> legalEntityPtQps = Instance.getValueForMetaPropertyToManyResolved(legalEntityPt, M3Properties.qualifiedPropertiesFromAssociations, processorSupport);
         Assert.assertEquals(2, legalEntityPtQps.size());
         assertMilestoningQualifiedProperty(legalEntityPtQps.get(0), "registeredInPt", "Location", "0..1", 2);
         assertMilestoningQualifiedProperty(legalEntityPtQps.get(1), "registeredInPt", "Location", "0..1", 1);
 
 
-        CoreInstance location = runtime.getCoreInstance("meta::relational::tests::milestoning::Location");
+        CoreInstance location = runtime.getCoreInstance("meta::external::store::relational::tests::milestoning::Location");
         ListIterable<? extends CoreInstance> locationQps = Instance.getValueForMetaPropertyToManyResolved(location, M3Properties.qualifiedPropertiesFromAssociations, processorSupport);
         Assert.assertEquals(6, locationQps.size());
         assertMilestoningQualifiedProperty(locationQps.get(0), "legalEntity", "LegalEntity", "0..1", 0);

@@ -17,7 +17,7 @@ package org.finos.legend.pure.m2.relational.serialization.grammar.v1.unloader;
 import org.finos.legend.pure.m2.relational.M2RelationalPaths;
 import org.finos.legend.pure.m3.compiler.Context;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel._import.ImportStub;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.mapping.RelationalAssociationImplementation;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.mapping.RelationalAssociationImplementation;
 import org.finos.legend.pure.m3.navigation.ProcessorSupport;
 import org.finos.legend.pure.m3.tools.matcher.MatchRunner;
 import org.finos.legend.pure.m3.tools.matcher.Matcher;

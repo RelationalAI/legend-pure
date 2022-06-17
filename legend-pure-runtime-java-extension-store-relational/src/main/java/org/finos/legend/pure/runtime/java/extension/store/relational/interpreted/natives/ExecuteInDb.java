@@ -128,15 +128,15 @@ public class ExecuteInDb extends NativeFunction
 
     public CoreInstance executeInDb(CoreInstance connectionInformation, String sql, int timeOutInSeconds, int fetchSize, CoreInstance functionExpressionToUseInStack, ProcessorSupport processorSupport)
     {
-        CoreInstance resultSetClassifier = processorSupport.package_getByUserPath("meta::relational::metamodel::execute::ResultSet");
+        CoreInstance resultSetClassifier = processorSupport.package_getByUserPath("meta::external::store::relational::metamodel::execute::ResultSet");
         if (resultSetClassifier == null)
         {
-            throw new RuntimeException("'meta::relational::metamodel::execute::ResultSet' is unknown");
+            throw new RuntimeException("'meta::external::store::relational::metamodel::execute::ResultSet' is unknown");
         }
-        CoreInstance rowClassifier = processorSupport.package_getByUserPath("meta::relational::metamodel::execute::Row");
+        CoreInstance rowClassifier = processorSupport.package_getByUserPath("meta::external::store::relational::metamodel::execute::Row");
         if (rowClassifier == null)
         {
-            throw new RuntimeException("'meta::relational::metamodel::execute::Row' is unknown");
+            throw new RuntimeException("'meta::external::store::relational::metamodel::execute::Row' is unknown");
         }
 
         CoreInstance pureResult = this.repository.newAnonymousCoreInstance(functionExpressionToUseInStack.getSourceInformation(), resultSetClassifier);
@@ -205,7 +205,7 @@ public class ExecuteInDb extends NativeFunction
 
                 if (dbType != null && dbHost != null && dbName != null && dbPort != null)
                 {
-                    CoreInstance dataSourceCoreInstance = this.repository.newEphemeralAnonymousCoreInstance(null, processorSupport.package_getByUserPath("meta::relational::runtime::DataSource"));
+                    CoreInstance dataSourceCoreInstance = this.repository.newEphemeralAnonymousCoreInstance(null, processorSupport.package_getByUserPath("meta::external::store::relational::runtime::DataSource"));
 
                     Instance.addValueToProperty(dataSourceCoreInstance, "host", this.repository.newStringCoreInstance(dbHost), processorSupport);
                     Instance.addValueToProperty(dataSourceCoreInstance, "port", this.repository.newIntegerCoreInstance(dbPort), processorSupport);
@@ -254,7 +254,7 @@ public class ExecuteInDb extends NativeFunction
             Instance.addValueToProperty(pureResult, "columnNames", repository.newStringCoreInstance(column), processorSupport);
         }
 
-        CoreInstance nullValue = repository.newCoreInstance("SQLNull", processorSupport.package_getByUserPath("meta::relational::metamodel::SQLNull"), null);
+        CoreInstance nullValue = repository.newCoreInstance("SQLNull", processorSupport.package_getByUserPath("meta::external::store::relational::metamodel::SQLNull"), null);
 
         if (rs.next())
         {
@@ -400,7 +400,7 @@ public class ExecuteInDb extends NativeFunction
     public void bulkInsertInDb(CoreInstance connectionInformation, CoreInstance table, Iterable<? extends Iterable<?>> values, CoreInstance functionExpressionToUseInStack, final ProcessorSupport processorSupport)
     {
 
-        if (!Instance.instanceOf(connectionInformation, "meta::relational::runtime::TestDatabaseConnection", processorSupport))
+        if (!Instance.instanceOf(connectionInformation, "meta::external::store::relational::runtime::TestDatabaseConnection", processorSupport))
         {
             throw new PureExecutionException("Bulk insert is only supported for the TestDatabaseConnection");
         }

@@ -18,10 +18,10 @@ import org.eclipse.collections.api.RichIterable;
 import org.finos.legend.pure.m2.relational.Database;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.functions.collection.Pair;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.functions.collection.TreeNode;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.RelationalOperationElement;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.TableAlias;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.join.Join;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.join.JoinTreeNode;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.RelationalOperationElement;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.TableAlias;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.join.Join;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.join.JoinTreeNode;
 import org.finos.legend.pure.m3.navigation.ProcessorSupport;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
 

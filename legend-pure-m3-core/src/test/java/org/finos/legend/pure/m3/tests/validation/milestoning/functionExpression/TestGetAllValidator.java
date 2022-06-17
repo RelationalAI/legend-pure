@@ -186,10 +186,10 @@ public class TestGetAllValidator extends AbstractPureTestWithCoreCompiledPlatfor
     @Test
     public void testBiTemporalGetAllWithCorrectTemporalDateParams() throws Exception
     {
-        String domain = "Class <<temporal.bitemporal>> meta::relational::tests::milestoning::Location{ place : String[1];}\n" +
+        String domain = "Class <<temporal.bitemporal>> meta::external::store::relational::tests::milestoning::Location{ place : String[1];}\n" +
                 "function go():Any[*]\n" +
                 "{\n" +
-                "   {|meta::relational::tests::milestoning::Location.all(%9999, %2017-5-26)};" +
+                "   {|meta::external::store::relational::tests::milestoning::Location.all(%9999, %2017-5-26)};" +
                 "}\n";
 
         runtime.createInMemorySource("domain.pure", domain);
@@ -199,37 +199,37 @@ public class TestGetAllValidator extends AbstractPureTestWithCoreCompiledPlatfor
     @Test
     public void testBiTemporalGetAllWithNoTemporalDateParams() throws Exception
     {
-        String domain = "Class <<temporal.bitemporal>> meta::relational::tests::milestoning::Location\n" +
+        String domain = "Class <<temporal.bitemporal>> meta::external::store::relational::tests::milestoning::Location\n" +
                 "{\n" +
                 "  place : String[1];\n" +
                 "}\n" +
                 "function go():Any[*]\n" +
                 "{\n" +
-                "   {|meta::relational::tests::milestoning::Location.all()};\n" +
+                "   {|meta::external::store::relational::tests::milestoning::Location.all()};\n" +
                 "}\n";
 
         runtime.createInMemorySource("domain.pure", domain);
 
         PureCompilationException e = Assert.assertThrows(PureCompilationException.class, runtime::compile);
-        Assert.assertEquals("Compilation error at (resource:domain.pure line:7 column:52), \"The type Location is  [bitemporal], [processingDate,businessDate] should be supplied as a parameter to all()\"", e.getMessage());
+        Assert.assertEquals("Compilation error at (resource:domain.pure line:7 column:69), \"The type Location is  [bitemporal], [processingDate,businessDate] should be supplied as a parameter to all()\"", e.getMessage());
     }
 
     @Test
     public void testBiTemporalGetAllWithInsufficientTemporalDateParams() throws Exception
     {
-        String domain = "Class <<temporal.bitemporal>> meta::relational::tests::milestoning::Location\n" +
+        String domain = "Class <<temporal.bitemporal>> meta::external::store::relational::tests::milestoning::Location\n" +
                 "{\n" +
                 "  place : String[1];\n" +
                 "}\n" +
                 "function go():Any[*]\n" +
                 "{\n" +
-                "   {|meta::relational::tests::milestoning::Location.all(%9999)};\n" +
+                "   {|meta::external::store::relational::tests::milestoning::Location.all(%9999)};\n" +
                 "}\n";
 
         runtime.createInMemorySource("domain.pure", domain);
 
         PureCompilationException e = Assert.assertThrows(PureCompilationException.class, runtime::compile);
-        Assert.assertEquals("Compilation error at (resource:domain.pure line:7 column:52), \"The type Location is  [bitemporal], [processingDate,businessDate] should be supplied as a parameter to all()\"", e.getMessage());
+        Assert.assertEquals("Compilation error at (resource:domain.pure line:7 column:69), \"The type Location is  [bitemporal], [processingDate,businessDate] should be supplied as a parameter to all()\"", e.getMessage());
     }
 }
 

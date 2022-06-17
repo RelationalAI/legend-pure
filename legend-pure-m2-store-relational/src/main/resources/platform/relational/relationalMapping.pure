@@ -30,19 +30,19 @@ import meta::pure::functions::collection::*;
 
 import meta::pure::mapping::*;
 
-import meta::relational::mapping::*;
+import meta::external::store::relational::mapping::*;
 
-import meta::relational::metamodel::*;
-import meta::relational::metamodel::join::*;
-import meta::relational::metamodel::relation::*;
+import meta::external::store::relational::metamodel::*;
+import meta::external::store::relational::metamodel::join::*;
+import meta::external::store::relational::metamodel::relation::*;
 
 // Relational Mapping
-Class meta::relational::mapping::RelationalInstanceSetImplementation extends InstanceSetImplementation
+Class meta::external::store::relational::mapping::RelationalInstanceSetImplementation extends InstanceSetImplementation
 {
     primaryKey : RelationalOperationElement[*];
 }
 
-Class meta::relational::mapping::FilterMapping
+Class meta::external::store::relational::mapping::FilterMapping
 {
     setMappingOwner : RelationalInstanceSetImplementation[0..1];
     joinTreeNode : JoinTreeNode[0..1];
@@ -51,13 +51,13 @@ Class meta::relational::mapping::FilterMapping
     filter : Filter[1];
 }
 
-Class meta::relational::mapping::GroupByMapping
+Class meta::external::store::relational::mapping::GroupByMapping
 {
     setMappingOwner : RelationalInstanceSetImplementation[0..1];
     columns : RelationalOperationElement[*];
 }
 
-Class meta::relational::mapping::RootRelationalInstanceSetImplementation extends RelationalInstanceSetImplementation, RelationalMappingSpecification
+Class meta::external::store::relational::mapping::RootRelationalInstanceSetImplementation extends RelationalInstanceSetImplementation, RelationalMappingSpecification
 {
     resolveFilter()
     {
@@ -135,23 +135,23 @@ Class meta::relational::mapping::RootRelationalInstanceSetImplementation extends
     }:RelationalOperationElement[*];
 }
 
-Class meta::relational::mapping::EmbeddedRelationalInstanceSetImplementation extends EmbeddedSetImplementation, RelationalInstanceSetImplementation
+Class meta::external::store::relational::mapping::EmbeddedRelationalInstanceSetImplementation extends EmbeddedSetImplementation, RelationalInstanceSetImplementation
 {
     setMappingOwner : RootRelationalInstanceSetImplementation[1];
 }
 
-Class meta::relational::mapping::OtherwiseEmbeddedRelationalInstanceSetImplementation extends EmbeddedRelationalInstanceSetImplementation,OtherwiseEmbeddedSetImplementation
+Class meta::external::store::relational::mapping::OtherwiseEmbeddedRelationalInstanceSetImplementation extends EmbeddedRelationalInstanceSetImplementation,OtherwiseEmbeddedSetImplementation
 {
 
 }
 
-Class meta::relational::mapping::InlineEmbeddedRelationalInstanceSetImplementation extends EmbeddedRelationalInstanceSetImplementation,InlineEmbeddedSetImplementation
+Class meta::external::store::relational::mapping::InlineEmbeddedRelationalInstanceSetImplementation extends EmbeddedRelationalInstanceSetImplementation,InlineEmbeddedSetImplementation
 {
 
 
 }
 
-Class meta::relational::mapping::RelationalPropertyMapping extends PropertyMapping
+Class meta::external::store::relational::mapping::RelationalPropertyMapping extends PropertyMapping
 {
    relationalOperationElement : RelationalOperationElement[1];
    transformer: ValueTransformer<Any>[0..1];
@@ -164,31 +164,31 @@ Class meta::relational::mapping::RelationalPropertyMapping extends PropertyMappi
    } : Any[1];
 }
 
-Class meta::relational::mapping::RelationalAssociationImplementation extends AssociationImplementation
+Class meta::external::store::relational::mapping::RelationalAssociationImplementation extends AssociationImplementation
 {
 }
 
 
-Class meta::relational::mapping::RelationalActivity extends meta::pure::mapping::Activity
+Class meta::external::store::relational::mapping::RelationalActivity extends meta::pure::mapping::Activity
 {
    sql : String[1];
    executionTimeInNanoSecond : Integer[0..1];
    sqlGenerationTimeInNanoSecond : Integer[0..1];
    connectionAcquisitionTimeInNanoSecond : Integer[0..1];
    executionPlanInformation : String[0..1];
-   dataSource : meta::relational::runtime::DataSource[0..1];
+   dataSource : meta::external::store::relational::runtime::DataSource[0..1];
 }
 
 // Semi Structured
 
-Class meta::relational::mapping::SemiStructuredRelationalPropertyMapping extends RelationalPropertyMapping
+Class meta::external::store::relational::mapping::SemiStructuredRelationalPropertyMapping extends RelationalPropertyMapping
 {
 }
 
-Class <<doc.deprecated>> meta::relational::mapping::SemiStructuredEmbeddedRelationalInstanceSetImplementation extends SemiStructuredRelationalPropertyMapping, EmbeddedRelationalInstanceSetImplementation
+Class <<doc.deprecated>> meta::external::store::relational::mapping::SemiStructuredEmbeddedRelationalInstanceSetImplementation extends SemiStructuredRelationalPropertyMapping, EmbeddedRelationalInstanceSetImplementation
 {
 }
 
-Class meta::relational::mapping::SemiStructuredRelationalInstanceSetImplementation extends RootRelationalInstanceSetImplementation
+Class meta::external::store::relational::mapping::SemiStructuredRelationalInstanceSetImplementation extends RootRelationalInstanceSetImplementation
 {
 }

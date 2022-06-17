@@ -25,11 +25,11 @@ import org.finos.legend.pure.m2.relational.serialization.grammar.v1.processor.Da
 import org.finos.legend.pure.m3.navigation.M3Properties;
 import org.finos.legend.pure.m3.navigation.PackageableElement.PackageableElement;
 import org.finos.legend.pure.m3.navigation.importstub.ImportStub;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.RelationalOperationElement;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Schema;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.join.Join;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.relation.Table;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.relation.View;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.RelationalOperationElement;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Schema;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.join.Join;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.relation.Table;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.relation.View;
 import org.finos.legend.pure.m3.navigation.ProcessorSupport;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
@@ -38,35 +38,35 @@ import java.io.IOException;
 
 public class Database
 {
-    public static SetIterable<org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Database> getAllIncludedDBs(org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Database database, ProcessorSupport processorSupport)
+    public static SetIterable<org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Database> getAllIncludedDBs(org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Database database, ProcessorSupport processorSupport)
     {
-        ListIterable<org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Database> includes = (ListIterable<org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Database>)ImportStub.withImportStubByPasses(database._includesCoreInstance().toList(), processorSupport);
+        ListIterable<org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Database> includes = (ListIterable<org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Database>)ImportStub.withImportStubByPasses(database._includesCoreInstance().toList(), processorSupport);
         if (includes.isEmpty())
         {
             return Sets.immutable.with(database);
         }
 
-        MutableSet<org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Database> results = UnifiedSet.<org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Database>newSet(includes.size() + 1).with(database);
+        MutableSet<org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Database> results = UnifiedSet.<org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Database>newSet(includes.size() + 1).with(database);
         collectIncludedDBs(results, includes, processorSupport);
         return results;
     }
 
-    private static void collectIncludedDBs(MutableSet<org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Database> results, ListIterable<? extends CoreInstance> databases, ProcessorSupport processorSupport)
+    private static void collectIncludedDBs(MutableSet<org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Database> results, ListIterable<? extends CoreInstance> databases, ProcessorSupport processorSupport)
     {
         for (CoreInstance db : databases)
         {
-            if (results.add((org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Database)db))
+            if (results.add((org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Database)db))
             {
-                ListIterable<? extends CoreInstance> includes = ImportStub.withImportStubByPasses(((org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Database)db)._includesCoreInstance().toList(), processorSupport);
+                ListIterable<? extends CoreInstance> includes = ImportStub.withImportStubByPasses(((org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Database)db)._includesCoreInstance().toList(), processorSupport);
                 collectIncludedDBs(results, includes, processorSupport);
             }
         }
     }
 
-    public static CoreInstance findTable(org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Database database, final String schemaName, final String tableName, final ProcessorSupport processorSupport)
+    public static CoreInstance findTable(org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Database database, final String schemaName, final String tableName, final ProcessorSupport processorSupport)
     {
         MutableList<CoreInstance> tables = Lists.mutable.empty();
-        for (org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Database db : getAllIncludedDBs(database, processorSupport))
+        for (org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Database db : getAllIncludedDBs(database, processorSupport))
         {
             Schema schema = db._schemas().selectWith(DatabaseProcessor.SCHEMA_NAME_PREDICATE, schemaName).toList().getFirst();
             if (schema != null)
@@ -108,10 +108,10 @@ public class Database
         }
     }
 
-    public static Join findJoin(org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Database database, String joinName, ProcessorSupport processorSupport)
+    public static Join findJoin(org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Database database, String joinName, ProcessorSupport processorSupport)
     {
         MutableList<Join> joins = Lists.mutable.empty();
-        for (org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Database db : getAllIncludedDBs(database, processorSupport))
+        for (org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Database db : getAllIncludedDBs(database, processorSupport))
         {
             Join join = (Join) db.getValueInValueForMetaPropertyToManyWithKey(M2RelationalProperties.joins, M3Properties.name, joinName);
             if (join != null)
@@ -162,7 +162,7 @@ public class Database
             if (tableSchema != null)
             {
                 String tableSchemaName = tableSchema._name();
-                org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Database tableDB = (org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Database)ImportStub.withImportStubByPass(tableSchema._databaseCoreInstance(), processorSupport);
+                org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Database tableDB = (org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Database)ImportStub.withImportStubByPass(tableSchema._databaseCoreInstance(), processorSupport);
                 if (tableDB != null)
                 {
                     writeDatabaseName(appendable, tableDB, true);
@@ -186,7 +186,7 @@ public class Database
         try
         {
             String joinName = join._name();
-            org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Database joinDB = (org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Database)ImportStub.withImportStubByPass(join._databaseCoreInstance() , processorSupport);
+            org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Database joinDB = (org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Database)ImportStub.withImportStubByPass(join._databaseCoreInstance() , processorSupport);
             if (joinDB != null)
             {
                 writeDatabaseName(appendable, joinDB, true);
@@ -203,7 +203,7 @@ public class Database
         }
     }
 
-    public static void writeDatabaseName(Appendable appendable, org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Database database, boolean writeBrackets)
+    public static void writeDatabaseName(Appendable appendable, org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Database database, boolean writeBrackets)
     {
         try
         {

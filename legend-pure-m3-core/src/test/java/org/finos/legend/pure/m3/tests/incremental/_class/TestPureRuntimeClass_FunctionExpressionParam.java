@@ -168,15 +168,15 @@ public class TestPureRuntimeClass_FunctionExpressionParam extends AbstractPureTe
     @Test
     public void testPureRuntimeClassProperty_GenericsLambdaModify() throws Exception
     {
-        String sourceId2 = "import meta::relational::tests::mapping::enumeration::model::domain::*;\n" +
+        String sourceId2 = "import meta::external::store::relational::tests::mapping::enumeration::model::domain::*;\n" +
                 "function go():Any[*]\n" +
                 "{\n" +
                 "   ProductSynonym.all()->filter([p | $p.value == 'A']);\n" +
                 "}\n";
-        String source = "import meta::relational::tests::mapping::enumeration::model::domain::*;\n" +
+        String source = "import meta::external::store::relational::tests::mapping::enumeration::model::domain::*;\n" +
 
                 "\n" +
-                "Class meta::relational::tests::mapping::enumeration::model::domain::ProductSynonym\n" +
+                "Class meta::external::store::relational::tests::mapping::enumeration::model::domain::ProductSynonym\n" +
                 "{\n" +
                 "   value:String[1];\n" +
                 "}\n" +
@@ -194,7 +194,7 @@ public class TestPureRuntimeClass_FunctionExpressionParam extends AbstractPureTe
     @Test
     public void testPureRuntimeClassProperty_NestedGenericsModify() throws Exception
     {
-        String sourceId2 = "import meta::relational::tests::mapping::enumeration::model::domain::*;\n" +
+        String sourceId2 = "import meta::external::store::relational::tests::mapping::enumeration::model::domain::*;\n" +
                 "\n" +
                 "Class meta::pure::functions::collection::AggregateValue<T,V,U>\n" +
                 "{\n" +
@@ -222,10 +222,10 @@ public class TestPureRuntimeClass_FunctionExpressionParam extends AbstractPureTe
                 "                   ,agg(x|$x.value,y|$y->count())\n" +
                 "                   ,['syn', 'count']);\n" +
                 "}\n";
-        String source = "import meta::relational::tests::mapping::enumeration::model::domain::*;\n" +
+        String source = "import meta::external::store::relational::tests::mapping::enumeration::model::domain::*;\n" +
 
                 "\n" +
-                "Class meta::relational::tests::mapping::enumeration::model::domain::ProductSynonym\n" +
+                "Class meta::external::store::relational::tests::mapping::enumeration::model::domain::ProductSynonym\n" +
                 "{\n" +
                 "   value:String[1];\n" +
                 "}\n" +
@@ -243,7 +243,7 @@ public class TestPureRuntimeClass_FunctionExpressionParam extends AbstractPureTe
     @Test
     public void testPureRuntimeClassProperty_NestedGenericsModifyProject() throws Exception
     {
-        String sourceId2 = "import meta::relational::tests::mapping::enumeration::model::domain::*;\n" +
+        String sourceId2 = "import meta::external::store::relational::tests::mapping::enumeration::model::domain::*;\n" +
                 "Class meta::pure::tds::TabularDataSet\n" +
                 "{\n" +
                 "   rows : TDSRow[*];\n" +
@@ -278,10 +278,10 @@ public class TestPureRuntimeClass_FunctionExpressionParam extends AbstractPureTe
                 "let synoynms = [^ProductSynonym(value='ABC'), ^ProductSynonym(value='DEF')];\n" +
                 "   assert([] == $synoynms->project(col(p|$p.value, 'Syn')).rows->map(r|$r.values), |'');\n" +
                 "}\n";
-        String source = "import meta::relational::tests::mapping::enumeration::model::domain::*;\n" +
+        String source = "import meta::external::store::relational::tests::mapping::enumeration::model::domain::*;\n" +
 
                 "\n" +
-                "Class meta::relational::tests::mapping::enumeration::model::domain::ProductSynonym\n" +
+                "Class meta::external::store::relational::tests::mapping::enumeration::model::domain::ProductSynonym\n" +
                 "{\n" +
                 "   value:String[1];\n" +
                 "}\n" +

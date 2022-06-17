@@ -14,10 +14,10 @@
 
 import meta::pure::mapping::*;
 import meta::pure::runtime::*;
-import meta::pure::store::*;
+import meta::pure::store::metamodel::*;
 import meta::pure::tools::*;
 import meta::pure::functions::collection::*;
-import meta::pure::mapping::aggregationAware::*;
+import meta::external::store::aggregationAware::*;
 
 // Mapping
 Class meta::pure::mapping::Mapping extends PackageableElement
@@ -176,7 +176,7 @@ Class meta::pure::mapping::SetImplementation extends PropertyOwnerImplementation
 
 Class meta::pure::mapping::PropertyMappingsImplementation extends PropertyOwnerImplementation
 {
-    stores : meta::pure::store::Store[*];
+    stores : meta::pure::store::metamodel::Store[*];
     propertyMappings : PropertyMapping[*];
 
     superMapping()
@@ -284,7 +284,7 @@ Class meta::pure::mapping::PropertyMapping
     localMappingProperty : Boolean[0..1];
     localMappingPropertyType : Type[0..1];
     localMappingPropertyMultiplicity : Multiplicity[0..1];
-    store : meta::pure::store::Store[0..1];
+    store : meta::pure::store::metamodel::Store[0..1];
 }
 
 Class meta::pure::mapping::PropertyMappingValueSpecificationContext extends ValueSpecificationContext
@@ -341,13 +341,13 @@ Class meta::pure::mapping::SubstituteStore
 
 // M2M
 
-Class meta::pure::mapping::modelToModel::PureInstanceSetImplementation extends InstanceSetImplementation
+Class meta::external::store::model::PureInstanceSetImplementation extends InstanceSetImplementation
 {
     srcClass : Type[0..1];
     filter : LambdaFunction<Any>[0..1]; // Boolean Expression
 }
 
-Class meta::pure::mapping::modelToModel::PurePropertyMapping extends PropertyMapping
+Class meta::external::store::model::PurePropertyMapping extends PropertyMapping
 {
     transform : LambdaFunction<Any>[1];
     transformer : ValueTransformer<Any>[0..1];
@@ -374,7 +374,7 @@ Class meta::pure::mapping::xStore::XStorePropertyMapping extends PropertyMapping
 
 // Aggregation Aware
 
-Class meta::pure::mapping::aggregationAware::AggregationAwareSetImplementation extends InstanceSetImplementation
+Class meta::external::store::aggregationAware::AggregationAwareSetImplementation extends InstanceSetImplementation
 {
     aggregateSetImplementations: AggregateSetImplementationContainer[*];
     mainSetImplementation: InstanceSetImplementation[1];
@@ -385,36 +385,36 @@ Class meta::pure::mapping::aggregationAware::AggregationAwareSetImplementation e
     }:PropertyMapping[*];
 }
 
-Class meta::pure::mapping::aggregationAware::AggregationAwarePropertyMapping extends PropertyMapping
+Class meta::external::store::aggregationAware::AggregationAwarePropertyMapping extends PropertyMapping
 {
 }
 
-Class meta::pure::mapping::aggregationAware::AggregateSetImplementationContainer
+Class meta::external::store::aggregationAware::AggregateSetImplementationContainer
 {
     index: Integer[1];
     aggregateSpecification: AggregateSpecification[1];
     setImplementation: InstanceSetImplementation[1];
 }
 
-Class meta::pure::mapping::aggregationAware::AggregateSpecification
+Class meta::external::store::aggregationAware::AggregateSpecification
 {
     canAggregate: Boolean[1];
-    groupByFunctions: meta::pure::mapping::aggregationAware::GroupByFunctionSpecification[*];
-    aggregateValues: meta::pure::mapping::aggregationAware::AggregationFunctionSpecification[*];
+    groupByFunctions: meta::external::store::aggregationAware::GroupByFunctionSpecification[*];
+    aggregateValues: meta::external::store::aggregationAware::AggregationFunctionSpecification[*];
 }
 
-Class meta::pure::mapping::aggregationAware::GroupByFunctionSpecification
+Class meta::external::store::aggregationAware::GroupByFunctionSpecification
 {
     groupByFn: LambdaFunction<Any>[1];
 }
 
-Class meta::pure::mapping::aggregationAware::AggregationFunctionSpecification
+Class meta::external::store::aggregationAware::AggregationFunctionSpecification
 {
     mapFn: LambdaFunction<Any>[1];
     aggregateFn: LambdaFunction<Any>[1];
 }
 
-Class meta::pure::mapping::aggregationAware::AggregateSpecificationValueSpecificationContext extends ValueSpecificationContext
+Class meta::external::store::aggregationAware::AggregateSpecificationValueSpecificationContext extends ValueSpecificationContext
 {
     aggregateSetImplementation: InstanceSetImplementation[1];
 }

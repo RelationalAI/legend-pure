@@ -30,20 +30,20 @@ import org.finos.legend.pure.m3.compiler.postprocessing.ProcessorState;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.functions.collection.Pair;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.functions.collection.TreeNode;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.type.generics.GenericType;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.mapping.ColumnMapping;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Column;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Database;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.DynaFunction;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.RelationalOperationElement;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.RelationalOperationElementWithJoin;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Schema;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.TableAlias;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.TableAliasColumn;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.datatype.DataType;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.join.Join;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.join.JoinTreeNode;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.relation.Table;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.relation.View;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.mapping.ColumnMapping;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Column;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Database;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.DynaFunction;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.RelationalOperationElement;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.RelationalOperationElementWithJoin;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Schema;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.TableAlias;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.TableAliasColumn;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.datatype.DataType;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.join.Join;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.join.JoinTreeNode;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.relation.Table;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.relation.View;
 import org.finos.legend.pure.m3.navigation.M3Properties;
 import org.finos.legend.pure.m3.navigation.PackageableElement.PackageableElement;
 import org.finos.legend.pure.m3.navigation.PrimitiveUtilities;
@@ -253,7 +253,7 @@ public class ViewProcessing extends RelationalMappingSpecificationProcessing
         if (relationalOperationElement instanceof  DynaFunction)
         {
             // type = Type.getTopType(processorSupport);
-            return (DataType)repository.newAnonymousCoreInstance(null, processorSupport.package_getByUserPath("meta::relational::metamodel::datatype::DataType"));
+            return (DataType)repository.newAnonymousCoreInstance(null, processorSupport.package_getByUserPath("meta::external::store::relational::metamodel::datatype::DataType"));
         }
         throw new PureCompilationException(relationalOperationElement.getSourceInformation(), ((GenericType)(relationalOperationElement._classifierGenericType() == null ? Type.wrapGenericType(processorSupport.getClassifier(relationalOperationElement), processorSupport) : relationalOperationElement._classifierGenericType()))._rawTypeCoreInstance().getName() + " are not currently supported in Views");
     }

@@ -129,8 +129,8 @@ public class TestGraphDSLCompilation extends AbstractPureTestWithCoreCompiled
     {
         try
         {
-            this.runtime.createInMemorySource("file.pure", "import meta::relational::tests::mapping::enumeration::model::domain::*;\n" +
-                    "Class meta::relational::tests::mapping::enumeration::model::domain::Product\n" +
+            this.runtime.createInMemorySource("file.pure", "import meta::external::store::relational::tests::mapping::enumeration::model::domain::*;\n" +
+                    "Class meta::external::store::relational::tests::mapping::enumeration::model::domain::Product\n" +
                     "{\n" +
                     "   description: String[1];\n" +
                     "   synonyms: ProductSynonym[*];\n" +
@@ -139,12 +139,12 @@ public class TestGraphDSLCompilation extends AbstractPureTestWithCoreCompiled
                     "      $this.synonyms->filter(s | $s.type == $type);\n" +
                     "   }:ProductSynonym[*];\n" +
                     "}\n" +
-                    "Class meta::relational::tests::mapping::enumeration::model::domain::ProductSynonym\n" +
+                    "Class meta::external::store::relational::tests::mapping::enumeration::model::domain::ProductSynonym\n" +
                     "{\n" +
                     "   type:ProductSynonymType[1];\n" +
                     "   value:String[1];\n" +
                     "}\n" +
-                    "Enum meta::relational::tests::mapping::enumeration::model::domain::ProductSynonymType\n" +
+                    "Enum meta::external::store::relational::tests::mapping::enumeration::model::domain::ProductSynonymType\n" +
                     "{\n" +
                     "   CUSIP,\n" +
                     "   GS_NUMBER\n" +
@@ -172,8 +172,8 @@ public class TestGraphDSLCompilation extends AbstractPureTestWithCoreCompiled
             Assert.assertEquals("Compilation error at (resource:file.pure line:30 column:20), \"The system can't find a match for the property / qualified property: synonymsByType1(_:ProductSynonymType[1])\"", e.getMessage());
         }
 
-        this.runtime.modify("file.pure", "import meta::relational::tests::mapping::enumeration::model::domain::*;\n" +
-                "Class meta::relational::tests::mapping::enumeration::model::domain::Product\n" +
+        this.runtime.modify("file.pure", "import meta::external::store::relational::tests::mapping::enumeration::model::domain::*;\n" +
+                "Class meta::external::store::relational::tests::mapping::enumeration::model::domain::Product\n" +
                 "{\n" +
                 "   description: String[1];\n" +
                 "   synonyms: ProductSynonym[*];\n" +
@@ -186,12 +186,12 @@ public class TestGraphDSLCompilation extends AbstractPureTestWithCoreCompiled
                 "      $this.synonyms->filter(s | $s.type.name == $typeString)->toOne();\n" +
                 "   }:ProductSynonym[1];\n" +
                 "}\n" +
-                "Class meta::relational::tests::mapping::enumeration::model::domain::ProductSynonym\n" +
+                "Class meta::external::store::relational::tests::mapping::enumeration::model::domain::ProductSynonym\n" +
                 "{\n" +
                 "   type:ProductSynonymType[1];\n" +
                 "   value:String[1];\n" +
                 "}\n" +
-                "Enum meta::relational::tests::mapping::enumeration::model::domain::ProductSynonymType\n" +
+                "Enum meta::external::store::relational::tests::mapping::enumeration::model::domain::ProductSynonymType\n" +
                 "{\n" +
                 "   CUSIP,\n" +
                 "   GS_NUMBER\n" +

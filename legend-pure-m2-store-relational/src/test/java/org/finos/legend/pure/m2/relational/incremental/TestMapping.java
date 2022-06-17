@@ -281,8 +281,8 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
                 "###Pure\n" +
                 "function test():Boolean[1]" +
                 "{" +
-                "   assert('db' == myMap.classMappings->first()->cast(@meta::relational::mapping::RelationalInstanceSetImplementation).propertyMappings->first()->cast(@meta::relational::mapping::RelationalPropertyMapping).relationalOperationElement->cast(@meta::relational::metamodel::TableAliasColumn).alias.database->toOne()->id(), |'');" +
-                "   assert('name' == myMap.classMappings->first()->cast(@meta::relational::mapping::RelationalInstanceSetImplementation).propertyMappings->at(0)->cast(@meta::relational::mapping::RelationalPropertyMapping).relationalOperationElement->cast(@meta::relational::metamodel::TableAliasColumn).column.name, |'');" +
+                "   assert('db' == myMap.classMappings->first()->cast(@meta::external::store::relational::mapping::RelationalInstanceSetImplementation).propertyMappings->first()->cast(@meta::external::store::relational::mapping::RelationalPropertyMapping).relationalOperationElement->cast(@meta::external::store::relational::metamodel::TableAliasColumn).alias.database->toOne()->id(), |'');" +
+                "   assert('name' == myMap.classMappings->first()->cast(@meta::external::store::relational::mapping::RelationalInstanceSetImplementation).propertyMappings->at(0)->cast(@meta::external::store::relational::mapping::RelationalPropertyMapping).relationalOperationElement->cast(@meta::external::store::relational::metamodel::TableAliasColumn).column.name, |'');" +
                 "}");
 
         this.runtime.compile();
@@ -353,7 +353,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
                                                    "###Pure\n" +
                                                    "function test():Boolean[1]" +
                                                    "{" +
-                                                   "   assert('name' == myMap.classMappings->first()->cast(@meta::relational::mapping::RelationalInstanceSetImplementation).propertyMappings->first()->cast(@meta::relational::mapping::RelationalPropertyMapping).relationalOperationElement->cast(@meta::relational::metamodel::TableAliasColumn).column.name, |'');" +
+                                                   "   assert('name' == myMap.classMappings->first()->cast(@meta::external::store::relational::mapping::RelationalInstanceSetImplementation).propertyMappings->first()->cast(@meta::external::store::relational::mapping::RelationalPropertyMapping).relationalOperationElement->cast(@meta::external::store::relational::metamodel::TableAliasColumn).column.name, |'');" +
                                                    "}");
 
         this.runtime.compile();
@@ -405,7 +405,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
                                                    "function test():Boolean[1]" +
                                                    "{" +
                                                    "  print('ok',1);" +
-                                                   "   assert('myJoin' == myMap.classMappings->first()->cast(@meta::relational::mapping::RelationalInstanceSetImplementation).propertyMappings->at(0)->cast(@meta::relational::mapping::RelationalPropertyMapping).relationalOperationElement->cast(@meta::relational::metamodel::RelationalOperationElementWithJoin).joinTreeNode.join.name, |'');" +
+                                                   "   assert('myJoin' == myMap.classMappings->first()->cast(@meta::external::store::relational::mapping::RelationalInstanceSetImplementation).propertyMappings->at(0)->cast(@meta::external::store::relational::mapping::RelationalPropertyMapping).relationalOperationElement->cast(@meta::external::store::relational::metamodel::RelationalOperationElementWithJoin).joinTreeNode.join.name, |'');" +
                                                    "}");
 
         this.runtime.compile();
@@ -443,7 +443,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
                                                    "###Pure\n" +
                                                    "function test():Boolean[1]" +
                                                    "{" +
-                                                   "   assert('myJoin' == myMap.classMappings->first()->cast(@meta::relational::mapping::RelationalInstanceSetImplementation).propertyMappings->at(1)->cast(@meta::relational::mapping::RelationalPropertyMapping).relationalOperationElement->cast(@meta::relational::metamodel::RelationalOperationElementWithJoin).joinTreeNode.join.name, |'');" +
+                                                   "   assert('myJoin' == myMap.classMappings->first()->cast(@meta::external::store::relational::mapping::RelationalInstanceSetImplementation).propertyMappings->at(1)->cast(@meta::external::store::relational::mapping::RelationalPropertyMapping).relationalOperationElement->cast(@meta::external::store::relational::metamodel::RelationalOperationElementWithJoin).joinTreeNode.join.name, |'');" +
                                                    "}");
 
         this.runtime.compile();
@@ -510,7 +510,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
                                                        "###Pure\n" +
                                                        "function test():Boolean[1]" +
                                                        "{" +
-                                                       "   assert('targetId' == myMap.classMappingById('targetId')->cast(@meta::relational::mapping::RelationalInstanceSetImplementation).id, |'');" +
+                                                       "   assert('targetId' == myMap.classMappingById('targetId')->cast(@meta::external::store::relational::mapping::RelationalInstanceSetImplementation).id, |'');" +
                                                        "}");
             this.runtime.compile();
             this.runtime.delete(USER_ID);
@@ -551,7 +551,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
                                                        "###Pure\n" +
                                                        "function test():Boolean[1]" +
                                                        "{" +
-                                                       "   assert('targetId' == myMap.classMappingById('targetId')->cast(@meta::relational::mapping::RelationalInstanceSetImplementation).id, |'');" +
+                                                       "   assert('targetId' == myMap.classMappingById('targetId')->cast(@meta::external::store::relational::mapping::RelationalInstanceSetImplementation).id, |'');" +
                                                        "}");
             this.runtime.compile();
             this.runtime.delete(USER_ID);
@@ -591,7 +591,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
                     "###Pure\n" +
                     "function test():Boolean[1]" +
                     "{" +
-                    "   assert('targetId' == myMap.classMappingById('targetId')->cast(@meta::relational::mapping::RelationalInstanceSetImplementation).id, |'');" +
+                    "   assert('targetId' == myMap.classMappingById('targetId')->cast(@meta::external::store::relational::mapping::RelationalInstanceSetImplementation).id, |'');" +
                     "}");
             try
             {
@@ -639,7 +639,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
                                                        "###Pure\n" +
                                                        "function test():Boolean[1]" +
                                                        "{" +
-                                                       "   assert('targetId' == myMap.classMappingById('targetId')->cast(@meta::relational::mapping::RelationalInstanceSetImplementation).id, |'');" +
+                                                       "   assert('targetId' == myMap.classMappingById('targetId')->cast(@meta::external::store::relational::mapping::RelationalInstanceSetImplementation).id, |'');" +
                                                        "}");
             try
             {

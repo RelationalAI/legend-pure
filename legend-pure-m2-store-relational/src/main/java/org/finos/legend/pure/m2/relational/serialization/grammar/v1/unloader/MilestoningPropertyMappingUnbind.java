@@ -21,13 +21,13 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.finos.legend.pure.m3.compiler.postprocessing.processor.milestoning.MilestoningFunctions;
 import org.finos.legend.pure.m3.compiler.unload.unbind.Shared;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.mapping.PropertyMapping;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.mapping.EmbeddedRelationalInstanceSetImplementation;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.mapping.RelationalPropertyMapping;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.mapping.RelationalInstanceSetImplementation;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Literal;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.RelationalOperationElement;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.TableAlias;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.TableAliasColumn;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.mapping.EmbeddedRelationalInstanceSetImplementation;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.mapping.RelationalPropertyMapping;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.mapping.RelationalInstanceSetImplementation;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Literal;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.RelationalOperationElement;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.TableAlias;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.TableAliasColumn;
 import org.finos.legend.pure.m3.navigation.ProcessorSupport;
 
 class MilestoningPropertyMappingUnbind

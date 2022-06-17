@@ -12,34 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import meta::pure::store::set::*;
-import meta::pure::store::*;
+import meta::pure::store::metamodel::set::*;
+import meta::pure::store::metamodel::*;
 
-Class meta::pure::store::Store extends PackageableElement
+Class meta::pure::store::metamodel::Store extends PackageableElement
 {
     includes : Store[*];
 }
 
-Class meta::pure::store::set::SetBasedStore extends meta::pure::store::Store
+Class meta::pure::store::metamodel::set::SetBasedStore extends meta::pure::store::metamodel::Store
 {
     namespaces : Namespace[*];
 }
 
-Class meta::pure::store::set::Namespace
+Class meta::pure::store::metamodel::set::Namespace
 {
     relations : SetRelation[*];
 }
 
-Class meta::pure::store::set::SetRelation
+Class meta::pure::store::metamodel::set::SetRelation
 {
     setColumns : SetColumn[*];
 }
 
-Class meta::pure::store::set::SetColumn
+Class meta::pure::store::metamodel::set::SetColumn
 {
 }
 
 Class meta::pure::metamodel::valuespecification::StoreValueSpecificationContext extends meta::pure::metamodel::valuespecification::ValueSpecificationContext
 {
-   store: meta::pure::store::Store[1];
+   store: meta::pure::store::metamodel::Store[1];
 }

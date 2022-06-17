@@ -19,7 +19,7 @@ import org.finos.legend.pure.m3.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.RuntimeVerifier;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.mapping.Mapping;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.mapping.SetImplementation;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.mapping.RootRelationalInstanceSetImplementation;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.mapping.RootRelationalInstanceSetImplementation;
 import org.junit.Assert;
 import org.junit.Test;
 

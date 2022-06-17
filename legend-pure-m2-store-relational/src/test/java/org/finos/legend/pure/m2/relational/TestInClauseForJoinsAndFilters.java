@@ -14,8 +14,8 @@
 
 package org.finos.legend.pure.m2.relational;
 
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Filter;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.join.Join;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Filter;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.join.Join;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.junit.Assert;
 import org.junit.Test;

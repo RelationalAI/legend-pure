@@ -26,16 +26,16 @@ import org.eclipse.collections.impl.list.mutable.FastList;
 import org.eclipse.collections.impl.utility.LazyIterate;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.mapping.Activity;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.mapping.RoutingActivity;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.mapping.RelationalActivity;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Column;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.RelationalOperationElement;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.SQLNull;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.execute.ResultSet;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.execute.Row;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.relation.Table;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.runtime.DataSource;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.runtime.DatabaseConnection;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.runtime.TestDatabaseConnection;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.mapping.RelationalActivity;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Column;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.RelationalOperationElement;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.SQLNull;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.execute.ResultSet;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.execute.Row;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.relation.Table;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.runtime.DataSource;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.runtime.DatabaseConnection;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.runtime.TestDatabaseConnection;
 import org.finos.legend.pure.m3.exception.PureExecutionException;
 import org.finos.legend.pure.m3.execution.ExecutionSupport;
 import org.finos.legend.pure.m3.navigation.ProcessorSupport;
@@ -117,7 +117,7 @@ public class RelationalNativeImplementation
 
     public static ResultSet fetchDbMetaData(DatabaseConnection pureConnection, SqlFunction<DatabaseMetaData, java.sql.ResultSet> sqlFunction, ImmutableMap<String, ? extends Function<ListIterable<Object>, String>> extraValues, Function0<ResultSet> resultSetBuilder, Function0<SQLNull> sqlNullBuilder, Function0<Row> rowBuilder, Function0<DataSource> datasourceBuilder, ExecutionSupport es)
     {
-        ResultSet pureResult = resultSetBuilder.value();//new Root_meta_relational_metamodel_execute_ResultSet_Impl("Anonymous_NoCounter");
+        ResultSet pureResult = resultSetBuilder.value();//new Root_meta_external_store_relational_metamodel_execute_ResultSet_Impl("Anonymous_NoCounter");
 
         Connection connection = null;
         ConnectionWithDataSourceInfo connectionWithDataSourceInfo = null;
@@ -131,7 +131,7 @@ public class RelationalNativeImplementation
             connection.setAutoCommit(true);
 
             int rowLimit = RelationalExecutionProperties.getMaxRows();
-            SQLNull sqlNull = sqlNullBuilder.value();//new Root_meta_relational_metamodel_SQLNull_Impl("SQLNull");
+            SQLNull sqlNull = sqlNullBuilder.value();//new Root_meta_external_store_relational_metamodel_SQLNull_Impl("SQLNull");
             String tz = pureConnection._timeZone() == null ? "GMT" : pureConnection._timeZone();
 
             String URL = connectionManagerHandler.getPotentialDebug(pureConnection, connection);
@@ -172,7 +172,7 @@ public class RelationalNativeImplementation
                     rowValues.add(function.valueOf(rowValues));
                 }
                 rows.add(rowBuilder.value()._valuesAddAll(rowValues)._parent(pureResult));
-//                rows.add((new Root_meta_relational_metamodel_execute_Row_Impl("Anonymous_NoCounter"))._valuesAddAll(rowValues)._parent(pureResult));
+//                rows.add((new Root_meta_external_store_relational_metamodel_execute_Row_Impl("Anonymous_NoCounter"))._valuesAddAll(rowValues)._parent(pureResult));
                 if (RelationalExecutionProperties.shouldThrowIfMaxRowsExceeded() && rowLimit > 0)
                 {
                     if (rowCount > rowLimit)
@@ -192,7 +192,7 @@ public class RelationalNativeImplementation
             String serverPrincipal = connectionWithDataSourceInfo.getDataSource().getServerPrincipal();
             if (pureConnection._type() != null && dbHost != null && dbPort != null && dbName != null)
             {
-                DataSource ds = datasourceBuilder.value();//new Root_meta_relational_runtime_DataSource_Impl("ID");
+                DataSource ds = datasourceBuilder.value();//new Root_meta_external_store_relational_runtime_DataSource_Impl("ID");
                 ds._type(pureConnection._type());
                 ds._port(dbPort.longValue());
                 ds._host(dbHost);
@@ -225,7 +225,7 @@ public class RelationalNativeImplementation
 
     public static ResultSet executeInDb(String sql, DatabaseConnection pureConnection, long queryTimeoutInSeconds, long fetchSize, SourceInformation si, Function0<ResultSet> resultSetBuilder, Function0<SQLNull> sqlNullBuilder, Function0<Row> rowBuilder, Function0<DataSource> datasourceBuilder, ExecutionSupport es)
     {
-        ResultSet pureResult = resultSetBuilder.value();//new Root_meta_relational_metamodel_execute_ResultSet_Impl("OK");
+        ResultSet pureResult = resultSetBuilder.value();//new Root_meta_external_store_relational_metamodel_execute_ResultSet_Impl("OK");
 
         Connection connection = null;
         ConnectionWithDataSourceInfo connectionWithDataSourceInfo = null;
@@ -241,7 +241,7 @@ public class RelationalNativeImplementation
             }
             pureResult._connectionAcquisitionTimeInNanoSecond(System.nanoTime() - startRequestConnection);
 
-            SQLNull sqlNull = sqlNullBuilder.value();//new Root_meta_relational_metamodel_SQLNull_Impl("SQLNull");
+            SQLNull sqlNull = sqlNullBuilder.value();//new Root_meta_external_store_relational_metamodel_SQLNull_Impl("SQLNull");
             String tz = pureConnection._timeZone() == null ? "GMT" : pureConnection._timeZone();
 
             String URL = connectionManagerHandler.getPotentialDebug(pureConnection, connection);
@@ -261,7 +261,7 @@ public class RelationalNativeImplementation
             String serverPrincipal = connectionWithDataSourceInfo.getDataSource().getServerPrincipal();
             if (pureConnection._type() != null && dbHost != null && dbPort != null && dbName != null)
             {
-                DataSource ds = datasourceBuilder.value();//new Root_meta_relational_runtime_DataSource_Impl("ID");
+                DataSource ds = datasourceBuilder.value();//new Root_meta_external_store_relational_runtime_DataSource_Impl("ID");
                 ds._type(pureConnection._type());
                 ds._port(dbPort.longValue());
                 ds._host(dbHost);
@@ -325,7 +325,7 @@ public class RelationalNativeImplementation
         public Row valueOf(RichIterable<Object> values)
         {
 
-            Row row = rowBuilder.value();//new Root_meta_relational_metamodel_execute_Row_Impl("ID");
+            Row row = rowBuilder.value();//new Root_meta_external_store_relational_metamodel_execute_Row_Impl("ID");
             row = row._parent(this.pureResult);
             row._valuesAddAll(values);
             return row;

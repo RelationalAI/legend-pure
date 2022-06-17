@@ -24,9 +24,9 @@ import org.finos.legend.pure.m2.dsl.mapping.serialization.grammar.v1.Enumeration
 import org.finos.legend.pure.m2.dsl.mapping.serialization.grammar.v1.MappingParser;
 import org.finos.legend.pure.m2.relational.serialization.grammar.v1.RelationalParser;
 import org.finos.legend.pure.m3.compiler.validation.ValidationType;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Database;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.relation.BusinessSnapshotMilestoning;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.relation.Milestoning;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Database;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.relation.BusinessSnapshotMilestoning;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.relation.Milestoning;
 import org.finos.legend.pure.m3.navigation.Instance;
 import org.finos.legend.pure.m3.navigation.M3Properties;
 import org.finos.legend.pure.m3.navigation.PackageableElement.PackageableElement;
@@ -81,10 +81,10 @@ public class TestSimpleGrammar extends AbstractPureRelationalTestWithCoreCompile
                 "    let et = myDatabase.schema('default').table('employeeTable');\n" +
                 "    assert('employeeTable' == $et.name, |'');\n" +
                 "    assert($et.columns->size() == 2, |'');\n" +
-                "    assert(['id', 'name'] == $et.columns->cast(@meta::relational::metamodel::Column)->map(c | $c.name), |'');\n" +
+                "    assert(['id', 'name'] == $et.columns->cast(@meta::external::store::relational::metamodel::Column)->map(c | $c.name), |'');\n" +
                 "    let ft = myDatabase.schema('default').table('firmTable');\n" +
                 "    assert('firmTable' == $ft.name, |'');\n" +
-                "    assert(['id', 'name'] == $ft.columns->cast(@meta::relational::metamodel::Column)->map(c | $c.name), |'');\n" +
+                "    assert(['id', 'name'] == $ft.columns->cast(@meta::external::store::relational::metamodel::Column)->map(c | $c.name), |'');\n" +
                 "}\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
         runtime.compile();
         CoreInstance db = this.graphWalker.getDbInstance("pack::myDatabase");
@@ -2399,10 +2399,10 @@ public class TestSimpleGrammar extends AbstractPureRelationalTestWithCoreCompile
                 ")\n" +
                 "###Pure\n" +
                 "import other::*;\n" +
-                "import meta::relational::metamodel::*;\n" +
-                "import meta::relational::metamodel::relation::*;\n" +
+                "import meta::external::store::relational::metamodel::*;\n" +
+                "import meta::external::store::relational::metamodel::relation::*;\n" +
                 "import mapping::groupby::model::domain::*;\n" +
-                "import meta::relational::mapping::*;\n" +
+                "import meta::external::store::relational::mapping::*;\n" +
                 "\n" +
                 "function test():Boolean[1]\n" +
                 "{" +
@@ -2552,10 +2552,10 @@ public class TestSimpleGrammar extends AbstractPureRelationalTestWithCoreCompile
                 ")\n" +
                 "###Pure\n" +
                 "import other::*;\n" +
-                "import meta::relational::metamodel::*;\n" +
-                "import meta::relational::metamodel::relation::*;\n" +
+                "import meta::external::store::relational::metamodel::*;\n" +
+                "import meta::external::store::relational::metamodel::relation::*;\n" +
                 "import mapping::distinct::model::domain::*;\n" +
-                "import meta::relational::mapping::*;\n" +
+                "import meta::external::store::relational::mapping::*;\n" +
                 "\n" +
                 "function test():Boolean[1]\n" +
                 "{" +

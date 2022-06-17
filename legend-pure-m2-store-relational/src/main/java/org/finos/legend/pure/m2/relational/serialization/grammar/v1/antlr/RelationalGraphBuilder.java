@@ -131,7 +131,7 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
         }
 
         String associationPropertyMappings = visitPropertyMappings(ctx.propertyMappings(), mappingPath);
-        return "^meta::relational::mapping::RelationalAssociationImplementation" + setSourceInfo + "(" +
+        return "^meta::external::store::relational::mapping::RelationalAssociationImplementation" + setSourceInfo + "(" +
                 (id == null ? "" : "id = '" + id + "',") +
                 "association = ^meta::pure::metamodel::import::ImportStub " + classSourceInfo + " (importGroup=system::imports::" + importId + ", idOrPath='" + classPath + "')," +
                 "parent = ^meta::pure::metamodel::import::ImportStub (importGroup=system::imports::" + importId + ", idOrPath='" + mappingPath + "')," +
@@ -152,7 +152,7 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
         {
             mappingElements = visitMappingElementsBlock(ctx.mappingElements(), id, mappingPath);
         }
-        return "^meta::relational::mapping::RootRelationalInstanceSetImplementation" + setSourceInfo + "(" +
+        return "^meta::external::store::relational::mapping::RootRelationalInstanceSetImplementation" + setSourceInfo + "(" +
                 (id == null ? "" : "id = '" + id + "',") +
                 (extendsId == null ? "" : "superSetImplementationId = '" + extendsId + "',") +
                 "root = " + root + "," +
@@ -223,7 +223,7 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
             tx = visitTransformerBlock(ctx.transformer(), mappingPath);
         }
         String relationalOperation = visitJoinColWithDbOrConstantBlock(ctx.joinColWithDbOrConstant(), "", FastList.<String>newList(), scopeInfo);
-        return "^meta::relational::mapping::RelationalPropertyMapping" + sourceInformation.getPureSourceInformation(propertyName).toM4String() + "(" +
+        return "^meta::external::store::relational::mapping::RelationalPropertyMapping" + sourceInformation.getPureSourceInformation(propertyName).toM4String() + "(" +
                 "        localMappingProperty = " + localMappingProperty + "," +
                 (localMappingPropertyType == null ? "" : "        localMappingPropertyType = " + localMappingPropertyType + ",") +
                 buildMul(localMappingPropertyFirstMul, localMappingPropertySecondMul) +
@@ -296,9 +296,9 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
             }
             buffer.append(otherwisePropertyMappings.isEmpty() ?
                     embeddedResult.isEmpty() ?
-                            "^meta::relational::mapping::InlineEmbeddedRelationalInstanceSetImplementation" :
-                            "^meta::relational::mapping::EmbeddedRelationalInstanceSetImplementation" :
-                    "^meta::relational::mapping::OtherwiseEmbeddedRelationalInstanceSetImplementation")
+                            "^meta::external::store::relational::mapping::InlineEmbeddedRelationalInstanceSetImplementation" :
+                            "^meta::external::store::relational::mapping::EmbeddedRelationalInstanceSetImplementation" :
+                    "^meta::external::store::relational::mapping::OtherwiseEmbeddedRelationalInstanceSetImplementation")
                     .append(sourceInformation.getPureSourceInformation(propertyName).toM4String())
                     .append("(root = false,")
                     .append(targetId == null ? "" : "id = '" + targetId.getText() + "',")
@@ -341,7 +341,7 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
         Token targetId = ctx.identifier().getStart();
         String relationalOperation = visitOtherwiseJoinBlock(ctx.otherwiseJoin(), "", FastList.<String>newList(), scopeInfo);
 
-        return "^meta::relational::mapping::RelationalPropertyMapping" + sourceInformation.getPureSourceInformation(propertyName).toM4String() + "(" +
+        return "^meta::external::store::relational::mapping::RelationalPropertyMapping" + sourceInformation.getPureSourceInformation(propertyName).toM4String() + "(" +
                 "        property = '" + propertyName.getText() + "'," +
                 (targetId == null ? "" : "        targetSetImplementationId = '" + targetId.getText() + "', ") +
                 "        relationalOperationElement = " + relationalOperation +
@@ -358,7 +358,7 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
         }
         joins = visitJoinSequenceBlock(otherwiseJoinContext.joinSequence(), scopeInfo, db);
 
-        return "^meta::relational::metamodel::RelationalOperationElementWithJoin(" +
+        return "^meta::external::store::relational::metamodel::RelationalOperationElementWithJoin(" +
                 "    joinTreeNode = " + joins +
                 ")";
     }
@@ -452,7 +452,7 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
             joins = visitFilterMappingJoinSequenceBlock(ctx.filterMappingJoinSequence(), new ScopeInfo(db, null, null, null), db);
             db = visitDatabase(ctx.database(1));
         }
-        String block = "^meta::relational::mapping::FilterMapping " + sourceInformation.getPureSourceInformation(ctx.identifier().getStart()).toM4String() + "(" +
+        String block = "^meta::external::store::relational::mapping::FilterMapping " + sourceInformation.getPureSourceInformation(ctx.identifier().getStart()).toM4String() + "(" +
                 (joins == null ? "" : "        joinTreeNode = " + joins + ",") +
                 "        database = " + db + "," +
                 "        filterName = '" + ctx.identifier().getText() + "'" +
@@ -475,10 +475,10 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
         String views = visitViewsBlock(ctx.view(), new ScopeInfo(dbImport, null, null, null, true));
         if (!tables.isEmpty())
         {
-            schemas = schemas + (schemas.isEmpty() ? "" : ",") + ("^meta::relational::metamodel::Schema " + sourceInformation.getPureSourceInformation(ctx.DATABASE().getSymbol(), ctx.qualifiedName().identifier().getStart(), ctx.GROUP_CLOSE().getSymbol()).toM4String() +
+            schemas = schemas + (schemas.isEmpty() ? "" : ",") + ("^meta::external::store::relational::metamodel::Schema " + sourceInformation.getPureSourceInformation(ctx.DATABASE().getSymbol(), ctx.qualifiedName().identifier().getStart(), ctx.GROUP_CLOSE().getSymbol()).toM4String() +
                     " (name='default', tables=[" + tables + "], views=[" + views + "])");
         }
-        return "^meta::relational::metamodel::Database " + ctx.qualifiedName().identifier().getText() + sourceInformation.getPureSourceInformation(ctx.DATABASE().getSymbol(), ctx.qualifiedName().identifier().getStart(), ctx.GROUP_CLOSE().getSymbol()).toM4String() +
+        return "^meta::external::store::relational::metamodel::Database " + ctx.qualifiedName().identifier().getText() + sourceInformation.getPureSourceInformation(ctx.DATABASE().getSymbol(), ctx.qualifiedName().identifier().getStart(), ctx.GROUP_CLOSE().getSymbol()).toM4String() +
                 (ctx.qualifiedName().packagePath() != null ? "@" + ctx.qualifiedName().packagePath().getText().substring(0, ctx.qualifiedName().packagePath().getText().length() - 2) : "") + "(name='" + ctx.qualifiedName().identifier().getText() +
                 "', package=" + (ctx.qualifiedName().packagePath() == null ? "::" : ctx.qualifiedName().packagePath().getText().substring(0, ctx.qualifiedName().packagePath().getText().length() - 2)) + ", includes = [" + includes + "], schemas=[" + schemas + "],joins=[" + joins + "],filters=[" + (filters.isEmpty() ? multiGrainFilter : !multiGrainFilter.isEmpty() ? filters + ", " + multiGrainFilter : filters) + "])";
     }
@@ -502,7 +502,7 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
     public String visitMultiGrainFilter(MultiGrainFilterContext ctx)
     {
         String operation = visitOp_operationBlock(ctx.op_operation(), null, null);
-        return "^meta::relational::metamodel::MultiGrainFilter " + ctx.identifier().getText() + sourceInformation.getPureSourceInformation(ctx.identifier().getStart()).toM4String() + "(name='" + ctx.identifier().getText() + "', operation=" + operation + ")";
+        return "^meta::external::store::relational::metamodel::MultiGrainFilter " + ctx.identifier().getText() + sourceInformation.getPureSourceInformation(ctx.identifier().getStart()).toM4String() + "(name='" + ctx.identifier().getText() + "', operation=" + operation + ")";
     }
 
     private String visitJoinsBlock(List<JoinContext> joins)
@@ -525,7 +525,7 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
     public String visitJoin(JoinContext ctx)
     {
         String operation = visitOp_operationBlock(ctx.op_operation(), null, null);
-        return "^meta::relational::metamodel::join::Join " + ctx.identifier().getText() + sourceInformation.getPureSourceInformation(ctx.identifier().getStart()).toM4String() + "(name='" + ctx.identifier().getText() + "', operation=" + operation + ")";
+        return "^meta::external::store::relational::metamodel::join::Join " + ctx.identifier().getText() + sourceInformation.getPureSourceInformation(ctx.identifier().getStart()).toM4String() + "(name='" + ctx.identifier().getText() + "', operation=" + operation + ")";
     }
 
     private String visitFiltersBlock(List<FilterContext> filters)
@@ -588,7 +588,7 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
         ScopeInfo viewSchemaScopeInfo = new ScopeInfo(dbImport, ctx.identifier().getStart(), null, null, true);
         String views = visitViewsBlock(ctx.view(), viewSchemaScopeInfo);
 
-        return "^meta::relational::metamodel::Schema " + sourceInformation.getPureSourceInformation(ctx.identifier().getStart(), ctx.identifier().getStart(), ctx.GROUP_CLOSE().getSymbol()).toM4String() + " (name='" + ctx.identifier().getText() + "', tables=[" + tables + "], views=[" + views + "])";
+        return "^meta::external::store::relational::metamodel::Schema " + sourceInformation.getPureSourceInformation(ctx.identifier().getStart(), ctx.identifier().getStart(), ctx.GROUP_CLOSE().getSymbol()).toM4String() + " (name='" + ctx.identifier().getText() + "', tables=[" + tables + "], views=[" + views + "])";
     }
 
     private String visitTablesBlock(List<TableContext> tables)
@@ -632,7 +632,7 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
         boolean distinct = ctx.DISTINCTCMD() != null;
         Pair<String, String> result = visitViewColumnMappingLinesBlock(ctx.viewColumnMappingLines(), viewSchemaScopeInfo, pks);
 
-        return "^meta::relational::metamodel::relation::View" + sourceInformation.getPureSourceInformation(ctx.VIEW().getSymbol(), ctx.relationalIdentifier().getStart(), ctx.GROUP_CLOSE().getSymbol()).toM4String() + "(" +
+        return "^meta::external::store::relational::metamodel::relation::View" + sourceInformation.getPureSourceInformation(ctx.VIEW().getSymbol(), ctx.relationalIdentifier().getStart(), ctx.GROUP_CLOSE().getSymbol()).toM4String() + "(" +
                 "name = '" + ctx.relationalIdentifier().getText() + "'," +
                 "columns = [" + result.getOne() + "]," +
                 (filterBlock == null ? "" : "filter=" + filterBlock + ",") +
@@ -647,7 +647,7 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
     {
         String operation = visitOp_operationBlock(ctx.op_operation(), null, null);
 
-        return "^meta::relational::metamodel::Filter " + ctx.identifier().getText() + sourceInformation.getPureSourceInformation(ctx.identifier().getStart()).toM4String() + "(name='" + ctx.identifier().getText() + "', operation=" + operation + ")";
+        return "^meta::external::store::relational::metamodel::Filter " + ctx.identifier().getText() + sourceInformation.getPureSourceInformation(ctx.identifier().getStart()).toM4String() + "(name='" + ctx.identifier().getText() + "', operation=" + operation + ")";
     }
 
     private String visitOp_operationBlock(Op_operationContext ctx, String database, ScopeInfo scopeInfo)
@@ -669,19 +669,19 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
         String possiblyModifiedParams = null;
         String oppositeBooleanOperator = "andor".replace(booleanOp, "");
         //we are trying to be clever here and extract params of right DynaFunction if it's same type boolean operation (and/or) to avoid nested DynaFunctions of same operation
-        if (right.startsWith("^meta::relational::metamodel::DynaFunction(name = '" + booleanOp + "'"))
+        if (right.startsWith("^meta::external::store::relational::metamodel::DynaFunction(name = '" + booleanOp + "'"))
         {
             int leftSquareBracket = right.indexOf('[');
             int rightSquareBracket = right.lastIndexOf(']');
             possiblyModifiedParams = right.substring(leftSquareBracket + 1, rightSquareBracket);
         }
         //if root level operator on right hand side is opposite boolean operation wrap in group to enforce precedence
-        else if (right.startsWith("^meta::relational::metamodel::DynaFunction(name = '" + oppositeBooleanOperator + "'"))
+        else if (right.startsWith("^meta::external::store::relational::metamodel::DynaFunction(name = '" + oppositeBooleanOperator + "'"))
         {
-            possiblyModifiedParams = "^meta::relational::metamodel::DynaFunction(name = 'group', parameters = " + right + ")";
+            possiblyModifiedParams = "^meta::external::store::relational::metamodel::DynaFunction(name = 'group', parameters = " + right + ")";
         }
         String params = possiblyModifiedParams == null ? left + ", " + right : left + ", " + possiblyModifiedParams;
-        return "^meta::relational::metamodel::DynaFunction(name = '" + booleanOp + "', parameters = [" + params + "])";
+        return "^meta::external::store::relational::metamodel::DynaFunction(name = '" + booleanOp + "', parameters = [" + params + "])";
     }
 
     @Override
@@ -705,7 +705,7 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
             sb.append(",");
         }
         ParsingUtils.removeLastCommaCharacterIfPresent(sb);
-        return "^meta::relational::metamodel::DynaFunction(name = '" + functionName + "', parameters=[" + sb.toString() + "])";
+        return "^meta::external::store::relational::metamodel::DynaFunction(name = '" + functionName + "', parameters=[" + sb.toString() + "])";
     }
 
     public String visitFunctionArgument(FunctionArgumentContext ctx, ScopeInfo scopeInfo)
@@ -722,7 +722,7 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
             sb.append(",");
         }
         ParsingUtils.removeLastCommaCharacterIfPresent(sb);
-        return "^meta::relational::metamodel::LiteralList(values=[" + sb.toString() + "])";
+        return "^meta::external::store::relational::metamodel::LiteralList(values=[" + sb.toString() + "])";
     }
 
     private String visitOp_atomicOperationBlock(Op_atomicOperationContext ctx, ScopeInfo scopeInfo)
@@ -739,15 +739,15 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
         {
             operation = visitOp_operator(ctx.op_operator());
             right = visitColWithDbOrConstantBlock(ctx.colWithDbOrConstant(1), scopeInfo);
-            return "^meta::relational::metamodel::DynaFunction(name = '" + operation + "', parameters=[" + left + "," + right + "])";
+            return "^meta::external::store::relational::metamodel::DynaFunction(name = '" + operation + "', parameters=[" + left + "," + right + "])";
         }
         if (ctx.ISNULL() != null)
         {
-            return "^meta::relational::metamodel::DynaFunction(name = 'isNull', parameters=[" + left + "])";
+            return "^meta::external::store::relational::metamodel::DynaFunction(name = 'isNull', parameters=[" + left + "])";
         }
         if (ctx.ISNOTNULL() != null)
         {
-            return "^meta::relational::metamodel::DynaFunction(name = 'isNotNull', parameters=[" + left + "])";
+            return "^meta::external::store::relational::metamodel::DynaFunction(name = 'isNotNull', parameters=[" + left + "])";
         }
         return null;
     }
@@ -795,7 +795,7 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
     private String visitOp_groupOperationBlock(Op_groupOperationContext ctx, String database, ScopeInfo scopeInfo)
     {
         String result = visitOp_operationBlock(ctx.op_operation(), database, scopeInfo);
-        return "^meta::relational::metamodel::DynaFunction(name='group',parameters=" + result + ")";
+        return "^meta::external::store::relational::metamodel::DynaFunction(name='group',parameters=" + result + ")";
     }
 
 
@@ -819,8 +819,8 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
     {
         MutableList<String> tacPks = FastList.newList();
         String relationalOperation = visitJoinColWithDbOrConstantBlock(ctx.joinColWithDbOrConstant(), scopeInfo.getDatabase(), tacPks, scopeInfo);
-        String column = "^meta::relational::metamodel::Column" + sourceInformation.getPureSourceInformation(ctx.identifier(0).getStart()).toM4String() + "(name='" + ctx.identifier(0).getText() + "')";
-        String buffer = "^meta::relational::mapping::ColumnMapping" + sourceInformation.getPureSourceInformation(ctx.identifier(0).getStart()).toM4String() + "(" +
+        String column = "^meta::external::store::relational::metamodel::Column" + sourceInformation.getPureSourceInformation(ctx.identifier(0).getStart()).toM4String() + "(name='" + ctx.identifier(0).getText() + "')";
+        String buffer = "^meta::external::store::relational::mapping::ColumnMapping" + sourceInformation.getPureSourceInformation(ctx.identifier(0).getStart()).toM4String() + "(" +
                 "        columnName = '" + ctx.identifier(0).getText() + "', " + (ctx.identifier(1) == null ? "" : "targetSetImplementationId = '" + ctx.identifier(1).getText() + "', ") +
                 "        relationalOperationElement = " + relationalOperation + ")";
         if (tacPks.notEmpty())
@@ -836,7 +836,7 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
         if (ctx != null)
         {
             String columns = visitJoinColWithDbOrConstantsBlock(ctx.joinColWithDbOrConstants(), db, FastList.<String>newList(), new ScopeInfo(db, null, null, null));
-            return "^meta::relational::mapping::GroupByMapping " + sourceInformation.getPureSourceInformation(ctx.GROUP_OPEN().getSymbol()).toM4String() + "(columns = [" + columns + "])";
+            return "^meta::external::store::relational::mapping::GroupByMapping " + sourceInformation.getPureSourceInformation(ctx.GROUP_OPEN().getSymbol()).toM4String() + "(columns = [" + columns + "])";
         }
         return null;
     }
@@ -872,9 +872,9 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
                 if (ctx.op_column() != null)
                 {
                     String relationalOperationElement = visitOp_columnBlock(ctx.op_column(), db, pks, scopeInfo);
-                    return "^meta::relational::metamodel::RelationalOperationElementWithJoin(" + "    relationalOperationElement = " + relationalOperationElement + "," + "    joinTreeNode = " + joins + ")";
+                    return "^meta::external::store::relational::metamodel::RelationalOperationElementWithJoin(" + "    relationalOperationElement = " + relationalOperationElement + "," + "    joinTreeNode = " + joins + ")";
                 }
-                return "^meta::relational::metamodel::RelationalOperationElementWithJoin(" + "    joinTreeNode = " + joins + ")";
+                return "^meta::external::store::relational::metamodel::RelationalOperationElementWithJoin(" + "    joinTreeNode = " + joins + ")";
             }
             return visitOp_columnBlock(ctx.op_column(), db, pks, scopeInfo);
         }
@@ -911,7 +911,7 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
         if (ctx.GROUP_OPEN() != null)
         {
             String params = visitJoinColWithDbOrConstantsBlock(ctx.joinColWithDbOrConstants(), database, pks, scopeInfo);
-            return "^meta::relational::metamodel::DynaFunction(name='" + first.getText() + "', parameters=[" + params + "])";
+            return "^meta::external::store::relational::metamodel::DynaFunction(name='" + first.getText() + "', parameters=[" + params + "])";
         }
 
         ScopeInfo info = new ScopeInfo(database, null, null, first);
@@ -980,7 +980,7 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
 
     private String visitTableAliasColumnBlock(TableAliasColumnContext ctx, String database, MutableList<String> pks, ScopeInfo scopeInfo)
     {
-        String tableAliasColumn = "^meta::relational::metamodel::TableAliasColumn" + sourceInformation.getPureSourceInformation(ctx.relationalIdentifier().getStart()).toM4String() + "(" +
+        String tableAliasColumn = "^meta::external::store::relational::metamodel::TableAliasColumn" + sourceInformation.getPureSourceInformation(ctx.relationalIdentifier().getStart()).toM4String() + "(" +
                 "columnName='" + (ctx.relationalIdentifier().QUOTED_STRING() == null ? ctx.relationalIdentifier().identifier().getText() : ctx.relationalIdentifier().QUOTED_STRING().getText()) + "'," + "alias=" + generateTableAlias(new ScopeInfo(database, null, ctx.TARGET().getSymbol(), ctx.relationalIdentifier().getStart())) + ")";
         if (scopeInfo != null && scopeInfo.isParseView() && ctx.PRIMARYKEY() != null)
         {
@@ -998,7 +998,7 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
     {
         Token column = info.getColumn();
 
-        return "^meta::relational::metamodel::TableAliasColumn" + sourceInformation.getPureSourceInformation(column).toM4String() + "(" +
+        return "^meta::external::store::relational::metamodel::TableAliasColumn" + sourceInformation.getPureSourceInformation(column).toM4String() + "(" +
                 "columnName='" + column.getText() + "'," +
                 "alias=" + generateTableAlias(info) +
                 ")";
@@ -1026,7 +1026,7 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
             schema = null;
         }
 
-        return "^meta::relational::metamodel::TableAlias" + (schema == null ? sourceInformation.getPureSourceInformation(alias).toM4String() : sourceInformation.getPureSourceInformation(schema, schema, alias).toM4String()) + "(name = '" + alias.getText() + "'" +
+        return "^meta::external::store::relational::metamodel::TableAlias" + (schema == null ? sourceInformation.getPureSourceInformation(alias).toM4String() : sourceInformation.getPureSourceInformation(schema, schema, alias).toM4String()) + "(name = '" + alias.getText() + "'" +
                 (schema != null ? ",schema='" + schema.getText() + "'" : "") +
                 ("".equals(info.getDatabase()) ? "" : ",database=" + info.getDatabase()) +
                 ")";
@@ -1038,16 +1038,16 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
     {
         if (ctx.STRING() != null)
         {
-            return "^meta::relational::metamodel::Literal(value=" + ctx.STRING().getText() + ")";
+            return "^meta::external::store::relational::metamodel::Literal(value=" + ctx.STRING().getText() + ")";
         }
 
         if (ctx.INTEGER() != null)
         {
-            return "^meta::relational::metamodel::Literal(value=" + ctx.INTEGER().getText() + ")";
+            return "^meta::external::store::relational::metamodel::Literal(value=" + ctx.INTEGER().getText() + ")";
         }
         if (ctx.FLOAT() != null)
         {
-            return "^meta::relational::metamodel::Literal(value=" + ctx.FLOAT().getText() + ")";
+            return "^meta::external::store::relational::metamodel::Literal(value=" + ctx.FLOAT().getText() + ")";
         }
         return null;
     }
@@ -1070,7 +1070,7 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
             db = visitDatabase(ctx.database(1));
 
         }
-        return "^meta::relational::mapping::FilterMapping " + sourceInformation.getPureSourceInformation(ctx.identifier().getStart()).toM4String() + "(" +
+        return "^meta::external::store::relational::mapping::FilterMapping " + sourceInformation.getPureSourceInformation(ctx.identifier().getStart()).toM4String() + "(" +
                 (joins == null ? "" : "        joinTreeNode = " + joins + ",") +
                 "        database = " + (db == null ? viewDb : db) + "," +
                 "        filterName = '" + ctx.identifier().getText() + "'" +
@@ -1141,7 +1141,7 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
             throw new PureParserException(sourceInformation.getPureSourceInformation(joinType), "The joinType is not recognized. Valid join types are: " + values);
         }
         return new AsciiNodeBuilder(
-                "^meta::relational::metamodel::join::JoinTreeNode" + sourceInformation.getPureSourceInformation(ctx.identifier().getStart()).toM4String() + "(" +
+                "^meta::external::store::relational::metamodel::join::JoinTreeNode" + sourceInformation.getPureSourceInformation(ctx.identifier().getStart()).toM4String() + "(" +
                         (joinType == null ? "" : "           joinType='" + joinType.getText() + "',") +
                         "           joinName='" + ctx.identifier().getText() + "'" +
                         ("".equals(db) ? scope == null || scope.getDatabase().equals("") ? "" : ", database=" + scope.getDatabase() : ", database=" + db));
@@ -1161,7 +1161,7 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
     {
         String milestoneSpec = visitMilestoneSpec(ctx.milestoneSpec());
         String columns = visitColumnDefinitionsBlock(ctx.columnDefinitions(), pk);
-        return "^meta::relational::metamodel::relation::Table " + sourceInformation.getPureSourceInformation(ctx.relationalIdentifier().getStart()).toM4String() + "(name='" + (ctx.relationalIdentifier().QUOTED_STRING() == null ? ctx.relationalIdentifier().identifier().getText() : ctx.relationalIdentifier().QUOTED_STRING().getText()) + "',  columns = [" + columns + "], primaryKey = [" + pk.makeString(",") + "], " +
+        return "^meta::external::store::relational::metamodel::relation::Table " + sourceInformation.getPureSourceInformation(ctx.relationalIdentifier().getStart()).toM4String() + "(name='" + (ctx.relationalIdentifier().QUOTED_STRING() == null ? ctx.relationalIdentifier().identifier().getText() : ctx.relationalIdentifier().QUOTED_STRING().getText()) + "',  columns = [" + columns + "], primaryKey = [" + pk.makeString(",") + "], " +
                 "temporaryTable = false, milestoning=[" + milestoneSpec + "])";
     }
 
@@ -1237,7 +1237,7 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
             throw new PureParserException(sourceInformation.getPureSourceInformation(ctx.identifier().getStart()), exp.getMessage());
         }
 
-        return "^meta::relational::metamodel::Column " + sourceInformation.getPureSourceInformation(ctx.relationalIdentifier().getStart()).toM4String() + " (name='" + ctx.relationalIdentifier().getText() + "', type=" + pureType + ", nullable= " + nullable + ")";
+        return "^meta::external::store::relational::metamodel::Column " + sourceInformation.getPureSourceInformation(ctx.relationalIdentifier().getStart()).toM4String() + " (name='" + ctx.relationalIdentifier().getText() + "', type=" + pureType + ", nullable= " + nullable + ")";
 
     }
 
@@ -1275,18 +1275,18 @@ public class RelationalGraphBuilder extends org.finos.legend.pure.m2.relational.
     @Override
     public String visitBusinessMilestoningFrom(BusinessMilestoningFromContext ctx)
     {
-        return "^meta::relational::metamodel::relation::BusinessMilestoning(from='" + ctx.identifier(0).getText() + "', thru='" + ctx.identifier(1).getText() + "', thruIsInclusive = " + (ctx.THRU_IS_INCLUSIVE() == null ? false : ctx.BOOLEAN().getText()) + (ctx.INFINITY_DATE() == null ? "" : ", infinityDate=" + ctx.DATE().getText()) + ")";
+        return "^meta::external::store::relational::metamodel::relation::BusinessMilestoning(from='" + ctx.identifier(0).getText() + "', thru='" + ctx.identifier(1).getText() + "', thruIsInclusive = " + (ctx.THRU_IS_INCLUSIVE() == null ? false : ctx.BOOLEAN().getText()) + (ctx.INFINITY_DATE() == null ? "" : ", infinityDate=" + ctx.DATE().getText()) + ")";
     }
 
     @Override
     public String visitBussinessSnapshotDate(BussinessSnapshotDateContext ctx)
     {
-        return "^meta::relational::metamodel::relation::BusinessSnapshotMilestoning(snapshotDate = '" + ctx.identifier().getText() + "')";
+        return "^meta::external::store::relational::metamodel::relation::BusinessSnapshotMilestoning(snapshotDate = '" + ctx.identifier().getText() + "')";
     }
 
     @Override
     public String visitProcessingMilestoningInnerDefinition(org.finos.legend.pure.m2.relational.serialization.grammar.v1.antlr.RelationalParser.ProcessingMilestoningInnerDefinitionContext ctx)
     {
-        return "^meta::relational::metamodel::relation::ProcessingMilestoning(in='" + ctx.identifier(0).getText() + "', out='" + ctx.identifier(1).getText() + "', outIsInclusive = " + (ctx.OUT_IS_INCLUSIVE() == null ? false : ctx.BOOLEAN().getText()) + (ctx.INFINITY_DATE() == null ? "" : ", infinityDate=" + ctx.DATE().getText()) + ")";
+        return "^meta::external::store::relational::metamodel::relation::ProcessingMilestoning(in='" + ctx.identifier(0).getText() + "', out='" + ctx.identifier(1).getText() + "', outIsInclusive = " + (ctx.OUT_IS_INCLUSIVE() == null ? false : ctx.BOOLEAN().getText()) + (ctx.INFINITY_DATE() == null ? "" : ", infinityDate=" + ctx.DATE().getText()) + ")";
     }
 }

@@ -15,9 +15,9 @@
 package org.finos.legend.pure.m2.relational.serialization.grammar.v1.navigation;
 
 import org.finos.legend.pure.m2.relational.M2RelationalPaths;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Schema;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.TableAlias;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.relation.Table;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Schema;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.TableAlias;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.relation.Table;
 import org.finos.legend.pure.m3.navigation.ProcessorSupport;
 import org.finos.legend.pure.m3.serialization.runtime.navigation.NavigationHandler;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;

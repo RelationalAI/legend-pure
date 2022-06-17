@@ -347,7 +347,7 @@ public class TestMappingGrammar extends AbstractPureRelationalTestWithCoreCompil
 //                "###Pure\n" +
 //                "function test():Boolean[1]" +
 //                "{" +
-//                "   assertEquals('targetId', myMap.classMappingById('targetId')->cast(@meta::relational::mapping::RelationalInstanceSetImplementation).id);" +
+//                "   assertEquals('targetId', myMap.classMappingById('targetId')->cast(@meta::external::store::relational::mapping::RelationalInstanceSetImplementation).id);" +
 //                "}");
         try
         {
@@ -1001,7 +1001,7 @@ public class TestMappingGrammar extends AbstractPureRelationalTestWithCoreCompil
         CoreInstance mainTableAlias = Instance.getValueForMetaPropertyToOneResolved(classMapping, M2RelationalProperties.mainTableAlias, this.processorSupport);
         CoreInstance filterMapping = Instance.getValueForMetaPropertyToOneResolved(classMapping, M2RelationalProperties.filter, this.processorSupport);
         CoreInstance op = Instance.getValueForMetaPropertyToOneResolved(filterMapping, M2RelationalProperties.filter, M2RelationalProperties.operation, this.processorSupport);
-        Assert.assertTrue(Instance.instanceOf(op, "meta::relational::metamodel::DynaFunction", this.processorSupport));
+        Assert.assertTrue(Instance.instanceOf(op, "meta::external::store::relational::metamodel::DynaFunction", this.processorSupport));
 
 
 

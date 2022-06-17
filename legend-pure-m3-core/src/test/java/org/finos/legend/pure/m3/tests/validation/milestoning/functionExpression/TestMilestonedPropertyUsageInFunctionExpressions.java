@@ -677,9 +677,9 @@ public class TestMilestonedPropertyUsageInFunctionExpressions extends AbstractPu
     @Test
     public void testBiTemporalDatesNotSupplied()
     {
-        String domain = "import meta::relational::tests::milestoning::*;\n" +
-                "Class meta::relational::tests::milestoning::Order { createdLocation : Location[0..1]; }\n" +
-                "Class <<temporal.bitemporal>> meta::relational::tests::milestoning::Location{ place : String[1];}\n" +
+        String domain = "import meta::external::store::relational::tests::milestoning::*;\n" +
+                "Class meta::external::store::relational::tests::milestoning::Order { createdLocation : Location[0..1]; }\n" +
+                "Class <<temporal.bitemporal>> meta::external::store::relational::tests::milestoning::Location{ place : String[1];}\n" +
                 "function go():Any[*] { {|Order.all().createdLocation.place} }";
 
         runtime.createInMemorySource("domain.pure", domain);
@@ -691,9 +691,9 @@ public class TestMilestonedPropertyUsageInFunctionExpressions extends AbstractPu
     @Test
     public void testBiTemporalDatesArePropagatedFromBiTemporalRoot()
     {
-        String domain = "import meta::relational::tests::milestoning::*;\n" +
-                "Class <<temporal.bitemporal>> meta::relational::tests::milestoning::Order { createdLocation : Location[0..1]; }\n" +
-                "Class <<temporal.bitemporal>> meta::relational::tests::milestoning::Location{ place : String[1];}\n" +
+        String domain = "import meta::external::store::relational::tests::milestoning::*;\n" +
+                "Class <<temporal.bitemporal>> meta::external::store::relational::tests::milestoning::Order { createdLocation : Location[0..1]; }\n" +
+                "Class <<temporal.bitemporal>> meta::external::store::relational::tests::milestoning::Location{ place : String[1];}\n" +
                 "function go():Any[*] { {|Order.all(%9999,%2017).createdLocation.place} }";
 
         runtime.createInMemorySource("domain.pure", domain);
@@ -703,10 +703,10 @@ public class TestMilestonedPropertyUsageInFunctionExpressions extends AbstractPu
     @Test
     public void testBiTemporalDatesArePropagatedFromBiTemporalToBiTemporalInProject()
     {
-        String domain = "import meta::relational::tests::milestoning::*;\n" +
-                "Class  meta::relational::tests::milestoning::Order { createdLocation : Location[0..1]; }\n" +
-                "Class <<temporal.bitemporal>> meta::relational::tests::milestoning::Location{ place : Place[1];}\n" +
-                "Class <<temporal.bitemporal>> meta::relational::tests::milestoning::Place{ name : String[1];}\n" +
+        String domain = "import meta::external::store::relational::tests::milestoning::*;\n" +
+                "Class  meta::external::store::relational::tests::milestoning::Order { createdLocation : Location[0..1]; }\n" +
+                "Class <<temporal.bitemporal>> meta::external::store::relational::tests::milestoning::Location{ place : Place[1];}\n" +
+                "Class <<temporal.bitemporal>> meta::external::store::relational::tests::milestoning::Place{ name : String[1];}\n" +
                 "function go():Any[*] { {|Order.all().createdLocation(%9999,%2017).place.name} }\n";
 
         runtime.createInMemorySource("domain.pure", domain);
@@ -716,10 +716,10 @@ public class TestMilestonedPropertyUsageInFunctionExpressions extends AbstractPu
     @Test
     public void testBusinessTemporalDatesArePropagatedFromBiTemporalToBiTemporalInProject()
     {
-        String domain = "import meta::relational::tests::milestoning::*;\n" +
-                "Class  meta::relational::tests::milestoning::Order { createdLocation : Location[0..1]; }\n" +
-                "Class <<temporal.businesstemporal>> meta::relational::tests::milestoning::Location{ place : Place[1];}\n" +
-                "Class <<temporal.businesstemporal>> meta::relational::tests::milestoning::Place{ name : String[1];}\n" +
+        String domain = "import meta::external::store::relational::tests::milestoning::*;\n" +
+                "Class  meta::external::store::relational::tests::milestoning::Order { createdLocation : Location[0..1]; }\n" +
+                "Class <<temporal.businesstemporal>> meta::external::store::relational::tests::milestoning::Location{ place : Place[1];}\n" +
+                "Class <<temporal.businesstemporal>> meta::external::store::relational::tests::milestoning::Place{ name : String[1];}\n" +
                 "function go():Any[*] { {|Order.all().createdLocation(%9999).place.name} }"; //Order.all(%2017)->map(v_automap|$v_automap.createdLocation(%9999))->map(v_automap|$v_automap.place)
 
         runtime.createInMemorySource("domain.pure", domain);
@@ -729,9 +729,9 @@ public class TestMilestonedPropertyUsageInFunctionExpressions extends AbstractPu
     @Test
     public void testBiTemporalPropertyUsageWhenOnlyOneDatePropagated()
     {
-        String domain = "import meta::relational::tests::milestoning::*;\n" +
-                "Class <<temporal.businesstemporal>> meta::relational::tests::milestoning::Order { createdLocation : Location[0..1]; }\n" +
-                "Class <<temporal.bitemporal>> meta::relational::tests::milestoning::Location{ place : String[1];}\n" +
+        String domain = "import meta::external::store::relational::tests::milestoning::*;\n" +
+                "Class <<temporal.businesstemporal>> meta::external::store::relational::tests::milestoning::Order { createdLocation : Location[0..1]; }\n" +
+                "Class <<temporal.bitemporal>> meta::external::store::relational::tests::milestoning::Location{ place : String[1];}\n" +
                 "function go():Any[*] { {|Order.all(%2017).createdLocation.place} }";
 
         runtime.createInMemorySource("domain.pure", domain);
@@ -742,9 +742,9 @@ public class TestMilestonedPropertyUsageInFunctionExpressions extends AbstractPu
     @Test
     public void testBusinessDatePropagatedToBiTemporalTypeWhenProcessingDateSupplied()
     {
-        String domain = "import meta::relational::tests::milestoning::*;\n" +
-                "Class <<temporal.businesstemporal>> meta::relational::tests::milestoning::Order { createdLocation : Location[0..1]; }\n" +
-                "Class <<temporal.bitemporal>> meta::relational::tests::milestoning::Location{ place : String[1];}\n" +
+        String domain = "import meta::external::store::relational::tests::milestoning::*;\n" +
+                "Class <<temporal.businesstemporal>> meta::external::store::relational::tests::milestoning::Order { createdLocation : Location[0..1]; }\n" +
+                "Class <<temporal.bitemporal>> meta::external::store::relational::tests::milestoning::Location{ place : String[1];}\n" +
                 "function go():Any[*] { {|Order.all(%2017).createdLocation(%2016).place} }"; //Order.all(%2017)->map(v_automap|$v_automap.createdLocation(%9999))->map(v_automap|$v_automap.place)
 
         runtime.createInMemorySource("domain.pure", domain);
@@ -754,9 +754,9 @@ public class TestMilestonedPropertyUsageInFunctionExpressions extends AbstractPu
     @Test
     public void testProcessingDatePropagatedToBiTemporalTypeWhenBusinessDateSupplied()
     {
-        String domain = "import meta::relational::tests::milestoning::*;\n" +
-                "Class <<temporal.processingtemporal>> meta::relational::tests::milestoning::Order { createdLocation : Location[0..1]; }\n" +
-                "Class <<temporal.bitemporal>> meta::relational::tests::milestoning::Location{ place : String[1];}\n" +
+        String domain = "import meta::external::store::relational::tests::milestoning::*;\n" +
+                "Class <<temporal.processingtemporal>> meta::external::store::relational::tests::milestoning::Order { createdLocation : Location[0..1]; }\n" +
+                "Class <<temporal.bitemporal>> meta::external::store::relational::tests::milestoning::Location{ place : String[1];}\n" +
                 "function go():Any[*] { {|Order.all(%2017).createdLocation(%2016).place} }";
         runtime.createInMemorySource("domain.pure", domain);
         runtime.compile();
@@ -765,10 +765,10 @@ public class TestMilestonedPropertyUsageInFunctionExpressions extends AbstractPu
     @Test
     public void testPropagationOfSingleDateFromBiTemporalAll()
     {
-        String domain = "import meta::relational::tests::milestoning::*;\n" +
-                "Class <<temporal.bitemporal>> meta::relational::tests::milestoning::Product { exchange : Exchange[0..1]; }\n" +
-                "Class <<temporal.businesstemporal>> meta::relational::tests::milestoning::Exchange{ location : Location[1];}\n" +
-                "Class <<temporal.businesstemporal>> meta::relational::tests::milestoning::Location{ street : String[1];}\n" +
+        String domain = "import meta::external::store::relational::tests::milestoning::*;\n" +
+                "Class <<temporal.bitemporal>> meta::external::store::relational::tests::milestoning::Product { exchange : Exchange[0..1]; }\n" +
+                "Class <<temporal.businesstemporal>> meta::external::store::relational::tests::milestoning::Exchange{ location : Location[1];}\n" +
+                "Class <<temporal.businesstemporal>> meta::external::store::relational::tests::milestoning::Location{ street : String[1];}\n" +
                 "function go():Any[*] { {|Product.all(%9999, %2017-8-14).exchange.location.street} }";
 
         runtime.createInMemorySource("domain.pure", domain);
@@ -782,10 +782,10 @@ public class TestMilestonedPropertyUsageInFunctionExpressions extends AbstractPu
     @Test
     public void testPropagationOfSingleDateFromBiTemporalQualifiedProperty()
     {
-        String domain = "import meta::relational::tests::milestoning::*;\n" +
-                "Class meta::relational::tests::milestoning::Product { exchange : Exchange[0..1]; }\n" +
-                "Class <<temporal.bitemporal>> meta::relational::tests::milestoning::Exchange{ location : Location[1];}\n" +
-                "Class <<temporal.businesstemporal>> meta::relational::tests::milestoning::Location{ street : String[1];}\n" +
+        String domain = "import meta::external::store::relational::tests::milestoning::*;\n" +
+                "Class meta::external::store::relational::tests::milestoning::Product { exchange : Exchange[0..1]; }\n" +
+                "Class <<temporal.bitemporal>> meta::external::store::relational::tests::milestoning::Exchange{ location : Location[1];}\n" +
+                "Class <<temporal.businesstemporal>> meta::external::store::relational::tests::milestoning::Location{ street : String[1];}\n" +
                 "function go():Any[*] { {|Product.all().exchange(%9999, %2017-8-14).location.street} }";
 
         runtime.createInMemorySource("domain.pure", domain);

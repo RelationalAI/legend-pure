@@ -23,8 +23,8 @@ public class M2MappingPaths
     {
     }
 
-    public static final String AggregateSpecificationValueSpecificationContext = "meta::pure::mapping::aggregationAware::AggregateSpecificationValueSpecificationContext";
-    public static final String AggregationAwareSetImplementation = "meta::pure::mapping::aggregationAware::AggregationAwareSetImplementation";
+    public static final String AggregateSpecificationValueSpecificationContext = "meta::external::store::aggregationAware::AggregateSpecificationValueSpecificationContext";
+    public static final String AggregationAwareSetImplementation = "meta::external::store::aggregationAware::AggregationAwareSetImplementation";
     public static final String AssociationImplementation = "meta::pure::mapping::AssociationImplementation";
     public static final String EmbeddedSetImplementation = "meta::pure::mapping::EmbeddedSetImplementation";
     public static final String EnumerationMapping = "meta::pure::mapping::EnumerationMapping";
@@ -38,9 +38,9 @@ public class M2MappingPaths
     public static final String PropertyMappingsImplementation = "meta::pure::mapping::PropertyMappingsImplementation";
     public static final String PropertyMappingValueSpecificationContext = "meta::pure::mapping::PropertyMappingValueSpecificationContext";
     public static final String PropertyOwnerImplementation = "meta::pure::mapping::PropertyOwnerImplementation";
-    public static final String PureInstanceSetImplementation = "meta::pure::mapping::modelToModel::PureInstanceSetImplementation";
+    public static final String PureInstanceSetImplementation = "meta::external::store::model::PureInstanceSetImplementation";
     public static final String SetImplementation = "meta::pure::mapping::SetImplementation";
-    public static final String Store = "meta::pure::store::Store";
+    public static final String Store = "meta::pure::store::metamodel::Store";
     public static final String SubstituteStore = "meta::pure::mapping::SubstituteStore";
     public static final String ValueTransformer = "meta::pure::mapping::ValueTransformer";
     public static final String XStoreAssociationImplementation = "meta::pure::mapping::xStore::XStoreAssociationImplementation";

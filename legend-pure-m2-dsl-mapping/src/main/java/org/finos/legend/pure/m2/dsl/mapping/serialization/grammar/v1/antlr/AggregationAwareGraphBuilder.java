@@ -73,7 +73,7 @@ public class AggregationAwareGraphBuilder extends AggregationAwareParserBaseVisi
     public String visitMapping(AggregationAwareParser.MappingContext ctx)
     {
         visitChildren(ctx);
-        return "^meta::pure::mapping::aggregationAware::AggregationAwareSetImplementation" + this.setSourceInfo + "(" +
+        return "^meta::external::store::aggregationAware::AggregationAwareSetImplementation" + this.setSourceInfo + "(" +
                 ((this.id == null) ? "" : ("id = '" + this.id + "',")) +
                 "root = " + this.root + "," +
                 "class = ^meta::pure::metamodel::import::ImportStub " + this.classSourceInfo + " (importGroup=system::imports::" + this.importId + ", idOrPath='" + this.classPath + "')," +
@@ -87,9 +87,9 @@ public class AggregationAwareGraphBuilder extends AggregationAwareParserBaseVisi
     public String visitAggregationSpecification(AggregationAwareParser.AggregationSpecificationContext ctx)
     {
         String aggSpecSourceInfo = " " + this.sourceInformation.getPureSourceInformation(ctx.GROUP_OPEN().getSymbol(), ctx.GROUP_OPEN().getSymbol(), ctx.GROUP_CLOSE().getSymbol()).toM4String();
-        this.aggregateSetImplementations.append("^meta::pure::mapping::aggregationAware::AggregateSetImplementationContainer ").append(aggSpecSourceInfo).append(" (")
+        this.aggregateSetImplementations.append("^meta::external::store::aggregationAware::AggregateSetImplementationContainer ").append(aggSpecSourceInfo).append(" (")
                 .append("index=").append(this.index).append(",")
-                .append("aggregateSpecification=^meta::pure::mapping::aggregationAware::AggregateSpecification ").append(aggSpecSourceInfo).append(" (");
+                .append("aggregateSpecification=^meta::external::store::aggregationAware::AggregateSpecification ").append(aggSpecSourceInfo).append(" (");
         visitChildren(ctx);
         return null;
     }
@@ -132,13 +132,13 @@ public class AggregationAwareGraphBuilder extends AggregationAwareParserBaseVisi
         TemporaryPureAggregateSpecification temporarySpecification = parser.parseAggregateSpecification(content, lambdaContext, this.sourceInformation.getSourceName(), this.sourceInformation.getOffsetLine() + beginLine - 1, this.importId, index, this.repository, processorSupport, this.context);
 
         MutableList<String> groupByFunctionSpecifications = temporarySpecification.groupByFunctionSpecifications.collect(groupByFunctionSpecification ->
-                "^meta::pure::mapping::aggregationAware::GroupByFunctionSpecification " + groupByFunctionSpecification.sourceInformation.toM4String() + " (" +
+                "^meta::external::store::aggregationAware::GroupByFunctionSpecification " + groupByFunctionSpecification.sourceInformation.toM4String() + " (" +
                         "groupByFn=^meta::pure::metamodel::function::LambdaFunction " + lambdaContext.getLambdaFunctionUniqueName() + " " + groupByFunctionSpecification.groupByExpression.getSourceInformation().toM4String() + " (" +
                         "classifierGenericType=^meta::pure::metamodel::type::generics::GenericType " + groupByFunctionSpecification.groupByExpression.getSourceInformation().toM4String() + " (rawType=meta::pure::metamodel::function::LambdaFunction, typeArguments=^meta::pure::metamodel::type::generics::GenericType " + groupByFunctionSpecification.groupByExpression.getSourceInformation().toM4String() + " (rawType = ^meta::pure::metamodel::type::FunctionType " + groupByFunctionSpecification.groupByExpression.getSourceInformation().toM4String() + " ()))," +
                         "expressionSequence=" + M3AntlrParser.process(groupByFunctionSpecification.groupByExpression, processorSupport) + "))");
 
         MutableList<String> aggregationFunctionSpecifications = temporarySpecification.aggregationFunctionSpecifications.collect(aggregationFunctionSpecification ->
-                "^meta::pure::mapping::aggregationAware::AggregationFunctionSpecification " + aggregationFunctionSpecification.sourceInformation.toM4String() + " (" +
+                "^meta::external::store::aggregationAware::AggregationFunctionSpecification " + aggregationFunctionSpecification.sourceInformation.toM4String() + " (" +
                         "mapFn=^meta::pure::metamodel::function::LambdaFunction " + lambdaContext.getLambdaFunctionUniqueName() + " " + aggregationFunctionSpecification.mapExpression.getSourceInformation().toM4String() + " (" +
                         "classifierGenericType=^meta::pure::metamodel::type::generics::GenericType " + aggregationFunctionSpecification.mapExpression.getSourceInformation().toM4String()+ " (rawType=meta::pure::metamodel::function::LambdaFunction, typeArguments=^meta::pure::metamodel::type::generics::GenericType " + aggregationFunctionSpecification.mapExpression.getSourceInformation().toM4String()+ " (rawType = ^meta::pure::metamodel::type::FunctionType " + aggregationFunctionSpecification.mapExpression.getSourceInformation().toM4String() + " ()))," +
                         "expressionSequence=" + M3AntlrParser.process(aggregationFunctionSpecification.mapExpression, processorSupport) +

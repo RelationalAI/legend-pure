@@ -16,7 +16,7 @@ package org.finos.legend.pure.m2.relational;
 
 import org.finos.legend.pure.m3.navigation.importstub.ImportStub;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.mapping.PropertyMappingsImplementation;
-import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Database;
+import org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.Database;
 import org.finos.legend.pure.m3.navigation.ProcessorSupport;
 import org.finos.legend.pure.m4.coreinstance.SourceInformation;
 
@@ -26,19 +26,19 @@ public class TableAlias
     {
     }
 
-    public static org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.TableAlias copyTableAlias(org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.TableAlias tableAlias, SourceInformation newSourceInfo, ProcessorSupport processorSupport)
+    public static org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.TableAlias copyTableAlias(org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.TableAlias tableAlias, SourceInformation newSourceInfo, ProcessorSupport processorSupport)
     {
         return copyTableAlias(tableAlias, true, newSourceInfo, processorSupport);
     }
 
-    public static org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.TableAlias copyTableAlias(org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.TableAlias tableAlias, boolean copySourceInfo, ProcessorSupport processorSupport)
+    public static org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.TableAlias copyTableAlias(org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.TableAlias tableAlias, boolean copySourceInfo, ProcessorSupport processorSupport)
     {
         return copyTableAlias(tableAlias, !copySourceInfo, null, processorSupport);
     }
 
-    private static org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.TableAlias copyTableAlias(org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.TableAlias tableAlias, boolean replaceSourceInfo, SourceInformation newSourceInfo, ProcessorSupport processorSupport)
+    private static org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.TableAlias copyTableAlias(org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.TableAlias tableAlias, boolean replaceSourceInfo, SourceInformation newSourceInfo, ProcessorSupport processorSupport)
     {
-        org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.TableAlias copy = (org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.TableAlias)processorSupport.newAnonymousCoreInstance(replaceSourceInfo ? newSourceInfo : tableAlias.getSourceInformation(), M2RelationalPaths.TableAlias);
+        org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.TableAlias copy = (org.finos.legend.pure.m3.coreinstance.meta.external.store.relational.metamodel.TableAlias)processorSupport.newAnonymousCoreInstance(replaceSourceInfo ? newSourceInfo : tableAlias.getSourceInformation(), M2RelationalPaths.TableAlias);
 
         copy._name(tableAlias._name());
         copy._relationalElement(tableAlias._relationalElement());
