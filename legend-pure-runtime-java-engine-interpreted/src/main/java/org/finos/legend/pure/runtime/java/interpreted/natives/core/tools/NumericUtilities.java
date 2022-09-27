@@ -34,29 +34,23 @@ import java.math.BigInteger;
  */
 public class NumericUtilities
 {
-    public static Predicate<CoreInstance> IS_DECIMAL_CORE_INSTANCE(ProcessorSupport processorSupport)
+    public static final Predicate<CoreInstance> IS_DECIMAL_CORE_INSTANCE = new Predicate<CoreInstance>()
     {
-        return new Predicate<CoreInstance>()
+        @Override
+        public boolean accept(CoreInstance each)
         {
-            @Override
-            public boolean accept(CoreInstance each)
-            {
-                return M3Paths.Decimal.equals(PackageableElement.getUserPathForPackageableElement(processorSupport.getClassifier(each)));
-            }
-        };
-    }
+            return M3Paths.Decimal.equals(PackageableElement.getUserPathForPackageableElement(each.getClassifier()));
+        }
+    };
 
-    public static Predicate<CoreInstance> IS_FLOAT_CORE_INSTANCE(ProcessorSupport processorSupport)
+    public static final Predicate<CoreInstance> IS_FLOAT_CORE_INSTANCE = new Predicate<CoreInstance>()
     {
-        return new Predicate<CoreInstance>()
+        @Override
+        public boolean accept(CoreInstance each)
         {
-            @Override
-            public boolean accept(CoreInstance each)
-            {
-                return M3Paths.Float.equals(PackageableElement.getUserPathForPackageableElement(processorSupport.getClassifier(each)));
-            }
-        };
-    }
+            return M3Paths.Float.equals(PackageableElement.getUserPathForPackageableElement(each.getClassifier()));
+        }
+    };
 
     private NumericUtilities()
     {
@@ -67,13 +61,12 @@ public class NumericUtilities
      * Convert a Java number into a Pure number and wrap it in a
      * value specification.
      *
-     * @param javaNumber              Java number
+     * @param javaNumber Java number
      * @param bigDecimalToPureDecimal
-     * @param repository              model repository
+     * @param repository model repository
      * @return Pure number
      */
-    public static CoreInstance toPureNumberValueExpression(Number javaNumber,
-                                                           boolean bigDecimalToPureDecimal, ModelRepository repository, ProcessorSupport processorSupport)
+    public static CoreInstance toPureNumberValueExpression(Number javaNumber, boolean bigDecimalToPureDecimal, ModelRepository repository, ProcessorSupport processorSupport)
     {
         return ValueSpecificationBootstrap.wrapValueSpecification(toPureNumber(javaNumber, bigDecimalToPureDecimal, repository), true, processorSupport);
     }
@@ -86,8 +79,7 @@ public class NumericUtilities
      * @param repository model repository
      * @return Pure number
      */
-    public static CoreInstance toPureNumber(Number javaNumber, boolean bigDecimalToPureDecimal, ModelRepository
-            repository)
+    public static CoreInstance toPureNumber(Number javaNumber, boolean bigDecimalToPureDecimal, ModelRepository repository)
     {
         if (javaNumber == null)
         {
@@ -95,7 +87,7 @@ public class NumericUtilities
         }
         if (javaNumber instanceof BigDecimal)
         {
-            return bigDecimalToPureDecimal ? newPureDecimal((BigDecimal) javaNumber, repository) : newPureFloat((BigDecimal) javaNumber, repository);
+            return bigDecimalToPureDecimal ? newPureDecimal((BigDecimal)javaNumber, repository) : newPureFloat((BigDecimal)javaNumber, repository);
         }
         if (javaNumber instanceof Double)
         {
@@ -107,7 +99,7 @@ public class NumericUtilities
         }
         if (javaNumber instanceof BigInteger)
         {
-            return newPureInteger((BigInteger) javaNumber, repository);
+            return newPureInteger((BigInteger)javaNumber, repository);
         }
         if (javaNumber instanceof Long)
         {
@@ -222,13 +214,12 @@ public class NumericUtilities
     /**
      * Convert a Pure number into a Java number.
      *
-     * @param pureNumber       Pure number
-     * @param processorSupport
+     * @param pureNumber Pure number
      * @return Java number
      */
-    public static Number toJavaNumber(CoreInstance pureNumber, ProcessorSupport processorSupport)
+    public static Number toJavaNumber(CoreInstance pureNumber)
     {
-        String typeName = processorSupport.getClassifier(pureNumber).getName();
+        String typeName = pureNumber.getClassifier().getName();
         if (M3Paths.Integer.equals(typeName))
         {
             return PrimitiveUtilities.getIntegerValue(pureNumber);
@@ -250,12 +241,12 @@ public class NumericUtilities
      * @param pureNumbers Pure numbers
      * @return Java numbers
      */
-    public static ListIterable<Number> toJavaNumber(ListIterable<? extends CoreInstance> pureNumbers, ProcessorSupport processorSupport)
+    public static ListIterable<Number> toJavaNumber(ListIterable<? extends CoreInstance> pureNumbers)
     {
         MutableList<Number> javaNumbers = Lists.mutable.empty();
         for (CoreInstance pureNumber : pureNumbers)
         {
-            javaNumbers.add(toJavaNumber(pureNumber, processorSupport));
+            javaNumbers.add(toJavaNumber(pureNumber));
         }
         return javaNumbers;
     }
@@ -283,11 +274,11 @@ public class NumericUtilities
             }
             else if (right instanceof BigInteger)
             {
-                return new BigInteger(left.toString()).compareTo((BigInteger) right);
+                return new BigInteger(left.toString()).compareTo((BigInteger)right);
             }
             else if (right instanceof BigDecimal)
             {
-                return new BigDecimal(left.longValue()).compareTo((BigDecimal) right);
+                return new BigDecimal(left.longValue()).compareTo((BigDecimal)right);
             }
             else
             {
@@ -306,11 +297,11 @@ public class NumericUtilities
             }
             else if (right instanceof BigInteger)
             {
-                return new BigDecimal(left.doubleValue()).compareTo(new BigDecimal((BigInteger) right)); //NOSONAR
+                return new BigDecimal(left.doubleValue()).compareTo(new BigDecimal((BigInteger)right)); //NOSONAR
             }
             else if (right instanceof BigDecimal)
             {
-                return BigDecimal.valueOf(left.doubleValue()).compareTo((BigDecimal) right);
+                return BigDecimal.valueOf(left.doubleValue()).compareTo((BigDecimal)right);
             }
             else
             {
@@ -321,19 +312,19 @@ public class NumericUtilities
         {
             if ((right instanceof Integer) || (right instanceof Long))
             {
-                return ((BigInteger) left).compareTo(new BigInteger(right.toString()));
+                return ((BigInteger)left).compareTo(new BigInteger(right.toString()));
             }
             else if ((right instanceof Float) || (right instanceof Double))
             {
-                return new BigDecimal((BigInteger) left).compareTo(BigDecimal.valueOf(right.doubleValue()));
+                return new BigDecimal((BigInteger)left).compareTo(BigDecimal.valueOf(right.doubleValue()));
             }
             else if (right instanceof BigInteger)
             {
-                return ((BigInteger) left).compareTo((BigInteger) right);
+                return ((BigInteger)left).compareTo((BigInteger)right);
             }
             else if (right instanceof BigDecimal)
             {
-                return new BigDecimal((BigInteger) left).compareTo((BigDecimal) right);
+                return new BigDecimal((BigInteger)left).compareTo((BigDecimal)right);
             }
             else
             {
@@ -344,19 +335,19 @@ public class NumericUtilities
         {
             if ((right instanceof Integer) || (right instanceof Long))
             {
-                return ((BigDecimal) left).compareTo(new BigDecimal(right.longValue()));
+                return ((BigDecimal)left).compareTo(new BigDecimal(right.longValue()));
             }
             else if ((right instanceof Float) || (right instanceof Double))
             {
-                return ((BigDecimal) left).compareTo(BigDecimal.valueOf(right.doubleValue()));
+                return ((BigDecimal)left).compareTo(BigDecimal.valueOf(right.doubleValue()));
             }
             else if (right instanceof BigInteger)
             {
-                return ((BigDecimal) left).compareTo(new BigDecimal((BigInteger) right));
+                return ((BigDecimal)left).compareTo(new BigDecimal((BigInteger)right));
             }
             else if (right instanceof BigDecimal)
             {
-                return ((BigDecimal) left).compareTo((BigDecimal) right);
+                return ((BigDecimal)left).compareTo((BigDecimal)right);
             }
             else
             {

@@ -34,7 +34,7 @@ import org.finos.legend.pure.m4.coreinstance.SourceInformation;
 public class M3ProcessorSupport implements ProcessorSupport
 {
     private final Context context;
-    protected final ModelRepository modelRepository;
+    private final ModelRepository modelRepository;
 
     public M3ProcessorSupport(ModelRepository modelRepository)
     {

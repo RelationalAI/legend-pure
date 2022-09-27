@@ -14,15 +14,13 @@
 
 package org.finos.legend.pure.m3.navigation;
 
-import org.eclipse.collections.api.factory.Sets;
-import org.eclipse.collections.api.list.ListIterable;
+import java.io.IOException;
+
 import org.eclipse.collections.api.set.SetIterable;
 import org.eclipse.collections.api.stack.MutableStack;
 import org.eclipse.collections.impl.stack.mutable.ArrayStack;
-import org.finos.legend.pure.m4.ModelRepository;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-
-import java.io.IOException;
+import org.finos.legend.pure.m4.ModelRepository;
 
 public class Printer
 {
@@ -38,11 +36,11 @@ public class Printer
      * @param linePrefix string printed at the start of every line
      * @param maxDepth   maximum depth to print to
      */
-    public static void print(Appendable appendable, CoreInstance instance, String linePrefix, int maxDepth, ProcessorSupport processorSupport)
+    public static void print(Appendable appendable, CoreInstance instance, String linePrefix, int maxDepth)
     {
         try
         {
-            print(appendable, instance, linePrefix, 0, new ArrayStack<CoreInstance>(maxDepth + 1), instance.getRepository() == null ? Sets.immutable.empty() : instance.getRepository().getExclusionSet(), 0, maxDepth, processorSupport);
+            print(appendable, instance, linePrefix, 0, new ArrayStack<CoreInstance>(maxDepth + 1), instance.getRepository().getExclusionSet(), 0, maxDepth);
         }
         catch (IOException e)
         {
@@ -58,9 +56,9 @@ public class Printer
      * @param linePrefix string printed at the start of every line
      * @throws IOException
      */
-    public static void print(Appendable appendable, CoreInstance instance, String linePrefix, ProcessorSupport processorSupport)
+    public static void print(Appendable appendable, CoreInstance instance, String linePrefix)
     {
-        print(appendable, instance, linePrefix, DEFAULT_MAX_DEPTH, processorSupport);
+        print(appendable, instance, linePrefix, DEFAULT_MAX_DEPTH);
     }
 
     /**
@@ -70,9 +68,9 @@ public class Printer
      * @param instance   Pure instance to print
      * @param maxDepth   maximum depth to print to
      */
-    public static void print(Appendable appendable, CoreInstance instance, int maxDepth, ProcessorSupport processorSupport)
+    public static void print(Appendable appendable, CoreInstance instance, int maxDepth)
     {
-        print(appendable, instance, null, maxDepth, processorSupport);
+        print(appendable, instance, null, maxDepth);
     }
 
     /**
@@ -81,9 +79,9 @@ public class Printer
      * @param appendable appendable to print to
      * @param instance   Pure instance to print
      */
-    public static void print(Appendable appendable, CoreInstance instance, ProcessorSupport processorSupport)
+    public static void print(Appendable appendable, CoreInstance instance)
     {
-        print(appendable, instance, null, processorSupport);
+        print(appendable, instance, null);
     }
 
     /**
@@ -94,10 +92,10 @@ public class Printer
      * @param maxDepth   maximum depth to print to
      * @return string representation of instance
      */
-    public static String print(CoreInstance instance, String linePrefix, int maxDepth, ProcessorSupport processorSupport)
+    public static String print(CoreInstance instance, String linePrefix, int maxDepth)
     {
         StringBuilder builder = new StringBuilder(DEFAULT_INITIAL_STRING_BUFFER_SIZE);
-        print(builder, instance, linePrefix, maxDepth, processorSupport);
+        print(builder, instance, linePrefix, maxDepth);
         return builder.toString();
     }
 
@@ -108,9 +106,9 @@ public class Printer
      * @param linePrefix string printed at the start of every line
      * @return string representation of instance
      */
-    public static String print(CoreInstance instance, String linePrefix, ProcessorSupport processorSupport)
+    public static String print(CoreInstance instance, String linePrefix)
     {
-        return print(instance, linePrefix, DEFAULT_MAX_DEPTH, processorSupport);
+        return print(instance, linePrefix, DEFAULT_MAX_DEPTH);
     }
 
     /**
@@ -120,9 +118,9 @@ public class Printer
      * @param maxDepth maximum depth to print to
      * @return string representation of instance
      */
-    public static String print(CoreInstance instance, int maxDepth, ProcessorSupport processorSupport)
+    public static String print(CoreInstance instance, int maxDepth)
     {
-        return print(instance, null, maxDepth, processorSupport);
+        return print(instance, null, maxDepth);
     }
 
     /**
@@ -131,31 +129,33 @@ public class Printer
      * @param instance Pure instance to print
      * @return string representation of instance
      */
-    public static String print(CoreInstance instance, ProcessorSupport processorSupport)
+    public static String print(CoreInstance instance)
     {
-        return print(instance, null, processorSupport);
+        return print(instance, null);
     }
 
-    private static void print(Appendable appendable, CoreInstance instance, String linePrefix, int indentLevel, MutableStack<CoreInstance> processed, SetIterable<CoreInstance> exclude, int depth, int maxDepth, ProcessorSupport processorSupport) throws IOException
+    private static void print(Appendable appendable, CoreInstance instance, String linePrefix, int indentLevel, MutableStack<CoreInstance> processed, SetIterable<CoreInstance> exclude, int depth, int maxDepth) throws IOException
     {
         processed.push(instance);
 
         indent(appendable, linePrefix, indentLevel);
-        printInstanceName(appendable, instance, processorSupport);
+        printInstanceName(appendable, instance);
         for (String propertyName : instance.getKeys().toSortedList())
         {
-            ListIterable<? extends CoreInstance> values = instance.getValueForMetaPropertyToMany(propertyName);
+            CoreInstance property = instance.getKeyByName(propertyName);
+            CoreInstance classifier = property.getClassifier();
 
             appendable.append('\n');
             indent(appendable, linePrefix, indentLevel + 1);
             appendable.append(propertyName);
-            appendable.append("(Property)");
+            appendable.append('(');
+            appendable.append((classifier == null) ? "null" : classifier.getName());
+            appendable.append(')');
             appendable.append(':');
-
-            for (CoreInstance value : values)
+            for (CoreInstance value : instance.getValueForMetaPropertyToMany(property))
             {
                 appendable.append('\n');
-                if (processorSupport != null && processorSupport.getClassifier(value) != null && "ImportStub".equals(processorSupport.getClassifier(value).getName()))
+                if ("ImportStub".equals(value.getClassifier().getName()))
                 {
                     indent(appendable, linePrefix, indentLevel + 2);
                     appendable.append("[~>] ");
@@ -167,16 +167,16 @@ public class Printer
                     }
                     else
                     {
-                        //appendable.append("_"+resolvedNode.getSyntheticId());
+                       //appendable.append("_"+resolvedNode.getSyntheticId());
                         appendable.append(" instance ");
-                        appendable.append(processorSupport.getClassifier(resolvedNode).getName());//+"_"+resolvedNode.getClassifier().getSyntheticId());
+                        appendable.append(resolvedNode.getClassifier().getName());//+"_"+resolvedNode.getClassifier().getSyntheticId());
                     }
                 }
                 else if (exclude.contains(value) || exclude.contains(value.getValueForMetaPropertyToOne(M3Properties._package)))
                 {
                     indent(appendable, linePrefix, indentLevel + 2);
                     appendable.append("[X] ");
-                    printInstanceName(appendable, value, processorSupport);
+                    printInstanceName(appendable, value);
                 }
                 else if (depth >= maxDepth)
                 {
@@ -184,17 +184,17 @@ public class Printer
                     appendable.append("[>");
                     appendable.append(String.valueOf(maxDepth));
                     appendable.append("] ");
-                    printInstanceName(appendable, value, processorSupport);
+                    printInstanceName(appendable, value);
                 }
                 else if (processed.contains(value))
                 {
                     indent(appendable, linePrefix, indentLevel + 2);
                     appendable.append("[_] ");
-                    printInstanceName(appendable, value, processorSupport);
+                    printInstanceName(appendable, value);
                 }
                 else
                 {
-                    print(appendable, value, linePrefix, indentLevel + 2, processed, exclude, depth + 1, maxDepth, processorSupport);
+                    print(appendable, value, linePrefix, indentLevel + 2, processed, exclude, depth + 1, maxDepth);
                 }
             }
         }
@@ -213,12 +213,12 @@ public class Printer
         }
     }
 
-    private static void printInstanceName(Appendable appendable, CoreInstance instance, ProcessorSupport processorSupport) throws IOException
+    private static void printInstanceName(Appendable appendable, CoreInstance instance) throws IOException
     {
         String name = instance.getName();
         appendable.append(ModelRepository.possiblyReplaceAnonymousId(name));
         appendable.append(" instance ");
-        CoreInstance classifier = processorSupport == null ? instance.getClassifier() : processorSupport.getClassifier(instance);
+        CoreInstance classifier = instance.getClassifier();
         appendable.append((classifier == null) ? "null" : classifier.getName());
     }
 }

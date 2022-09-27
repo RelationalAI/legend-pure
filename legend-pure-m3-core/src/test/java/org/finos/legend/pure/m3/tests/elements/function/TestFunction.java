@@ -279,7 +279,7 @@ public class TestFunction extends AbstractPureTestWithCoreCompiledPlatform
                 "    name(Property):\n" +
                 "        test__Nil_0_ instance String\n" +
                 "    package(Property):\n" +
-                "        [X] Root instance Package", Printer.print(func, "", 3, runtime.getProcessorSupport()));
+                "        [X] Root instance Package", Printer.print(func, "", 3));
 
         Assert.assertEquals("test__Nil_0_ instance ConcreteFunctionDefinition\n" +
                 "    classifierGenericType(Property):\n" +
@@ -382,7 +382,7 @@ public class TestFunction extends AbstractPureTestWithCoreCompiledPlatform
                 "    name(Property):\n" +
                 "        test__Nil_0_ instance String\n" +
                 "    package(Property):\n" +
-                "        [X] Root instance Package", Printer.print(func, "", runtime.getProcessorSupport()));
+                "        [X] Root instance Package", Printer.print(func, ""));
     }
 
     @Test

@@ -93,8 +93,6 @@ public class FunctionExecutionInterpreted implements FunctionExecution
     private final ExecutionActivityListener executionActivityListener;
     private PureRuntime runtime;
 
-    private ProcessorSupport processorSupport;
-
     private CodeStorage storage;
     private Message message;
 
@@ -119,18 +117,12 @@ public class FunctionExecutionInterpreted implements FunctionExecution
         this.extensions = InterpretedExtensionLoader.extensions();
     }
 
-    public void setProcessorSupport(M3ProcessorSupport processorSupport)
-    {
-        this.processorSupport = processorSupport;
-        this.runtime.getIncrementalCompiler().setProcessorSupport(processorSupport);
-    }
+
 
     @Override
     public void init(PureRuntime runtime, Message message)
     {
         this.runtime = runtime;
-
-        this.processorSupport = new M3ProcessorSupport(this.runtime.getContext(), this.runtime.getModelRepository());
 
         this.nativeFunctions = UnifiedMap.newMap();
 
@@ -845,7 +837,7 @@ public class FunctionExecutionInterpreted implements FunctionExecution
         }
         else
         {
-            throw new PureExecutionException(functionExpressionToUseInStack.getSourceInformation(), "A new type (" + processorSupport.getClassifier(instance).getName() + ") must have been introduced in the ValueSpecification tree.");
+            throw new PureExecutionException(functionExpressionToUseInStack.getSourceInformation(), "A new type (" + instance.getClassifier().getName() + ") must have been introduced in the ValueSpecification tree.");
         }
     }
 
@@ -882,7 +874,7 @@ public class FunctionExecutionInterpreted implements FunctionExecution
     @Override
     public ProcessorSupport getProcessorSupport()
     {
-        return this.processorSupport;
+        return new M3ProcessorSupport(this.runtime.getContext(), this.runtime.getModelRepository());
     }
 
     @Override
