@@ -20,9 +20,8 @@ import org.finos.legend.pure.m3.navigation.generictype.match.ParameterMatchBehav
 import org.finos.legend.pure.m3.navigation.multiplicity.Multiplicity;
 import org.finos.legend.pure.m3.navigation.multiplicity.MultiplicityMatch;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.finos.legend.pure.m4.exception.PureCompilationException;
+import org.junit.*;
 
 public class TestMultiplicityMatch extends AbstractPureTestWithCoreCompiledPlatform
 {

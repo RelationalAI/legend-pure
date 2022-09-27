@@ -18,15 +18,16 @@ import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.map.ImmutableMap;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.tuple.Tuples;
-import org.finos.legend.pure.m3.navigation.Instance;
 import org.finos.legend.pure.m3.navigation.M3Paths;
 import org.finos.legend.pure.m3.navigation.M3Properties;
-import org.finos.legend.pure.m3.navigation.ProcessorSupport;
+import org.finos.legend.pure.m3.navigation.Instance;
 import org.finos.legend.pure.m3.navigation.generictype.GenericType;
 import org.finos.legend.pure.m3.navigation.multiplicity.Multiplicity;
 import org.finos.legend.pure.m3.navigation.property.Property;
+import org.finos.legend.pure.m3.navigation.ProcessorSupport;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.finos.legend.pure.m4.tools.SafeAppendable;
+
+import java.io.IOException;
 
 public class FunctionExpression
 {
@@ -67,24 +68,39 @@ public class FunctionExpression
         return Tuples.pair(returnGenericType, returnMultiplicity);
     }
 
-    public static <T extends Appendable> T printFunctionSignatureFromExpression(T appendable, CoreInstance functionExpression, ProcessorSupport processorSupport)
+    public static void printFunctionSignatureFromExpression(Appendable appendable, CoreInstance functionExpression, ProcessorSupport processorSupport)
     {
         String functionName = Instance.getValueForMetaPropertyToOneResolved(functionExpression, M3Properties.functionName, processorSupport).getName();
         ListIterable<? extends CoreInstance> parameterValues = Instance.getValueForMetaPropertyToManyResolved(functionExpression, M3Properties.parametersValues, processorSupport);
-        return printFunctionSignatureFromExpression(appendable, functionName, parameterValues, processorSupport);
+        printFunctionSignatureFromExpression(appendable, functionName, parameterValues, processorSupport);
     }
 
-    public static <T extends Appendable> T printFunctionSignatureFromExpression(T appendable, String functionName, ListIterable<? extends CoreInstance> parameterValues, ProcessorSupport processorSupport)
+    public static void printFunctionSignatureFromExpression(Appendable appendable, String functionName, ListIterable<? extends CoreInstance> parameterValues, ProcessorSupport processorSupport)
     {
-        SafeAppendable safeAppendable = SafeAppendable.wrap(appendable);
-        safeAppendable.append(functionName).append('(');
-        parameterValues.forEachWithIndex((parameterValue, i) ->
+        try
         {
-            ((i == 0) ? safeAppendable : safeAppendable.append(',')).append("_:");
-            GenericType.print(safeAppendable, Instance.getValueForMetaPropertyToOneResolved(parameterValue, M3Properties.genericType, processorSupport), processorSupport);
-            Multiplicity.print(safeAppendable, Instance.getValueForMetaPropertyToOneResolved(parameterValue, M3Properties.multiplicity, processorSupport), true);
-        });
-        safeAppendable.append(')');
-        return appendable;
+            appendable.append(functionName);
+            appendable.append('(');
+            boolean first = true;
+            for (CoreInstance parameterValue : parameterValues)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    appendable.append(',');
+                }
+                appendable.append("_:");
+                GenericType.print(appendable, Instance.getValueForMetaPropertyToOneResolved(parameterValue, M3Properties.genericType, processorSupport), processorSupport);
+                Multiplicity.print(appendable, Instance.getValueForMetaPropertyToOneResolved(parameterValue, M3Properties.multiplicity, processorSupport), true);
+            }
+            appendable.append(')');
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 }

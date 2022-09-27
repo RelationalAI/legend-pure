@@ -45,20 +45,18 @@ public class TestTypeInferenceObserver implements TypeInferenceObserver
     }
 
     @Override
-    public TypeInferenceObserver startProcessingFunction(CoreInstance functionDefinition, CoreInstance functionType)
+    public void startProcessingFunction(CoreInstance functionDefinition, CoreInstance functionType)
     {
         SourceInformation sourceInfo = functionDefinition.getSourceInformation();
         this.stack.push(((sourceInfo != null) && "inferenceTest.pure".equals(sourceInfo.getSourceId())) ? this.printObserver : this.stack.peek());
         activeObserver().startProcessingFunction(functionDefinition, functionType);
-        return this;
     }
 
     @Override
-    public TypeInferenceObserver finishedProcessingFunction(CoreInstance functionType)
+    public void finishedProcessingFunction(CoreInstance functionType)
     {
         activeObserver().finishedProcessingFunction(functionType);
         this.stack.pop();
-        return this;
     }
 
     public boolean isInATest()
@@ -67,170 +65,152 @@ public class TestTypeInferenceObserver implements TypeInferenceObserver
     }
 
     @Override
-    public TypeInferenceObserver resetTab()
+    public void resetTab()
     {
         activeObserver().resetTab();
-        return this;
     }
 
     @Override
-    public TypeInferenceObserver shiftTab(int i)
+    public void shiftTab()
     {
-        activeObserver().shiftTab(i);
-        return this;
+        activeObserver().shiftTab();
     }
 
     @Override
-    public TypeInferenceObserver startProcessingFunctionBody()
+    public void unShiftTab()
+    {
+        activeObserver().unShiftTab();
+    }
+
+    @Override
+    public void startProcessingFunctionBody()
     {
         activeObserver().startProcessingFunctionBody();
-        return this;
     }
 
     @Override
-    public TypeInferenceObserver finishedProcessingFunctionBody()
+    public void finishedProcessingFunctionBody()
     {
         activeObserver().finishedProcessingFunctionBody();
-        return this;
     }
 
     @Override
-    public TypeInferenceObserver startProcessingFunctionExpression(CoreInstance functionExpression)
+    public void startProcessingFunctionExpression(CoreInstance functionExpression)
     {
         activeObserver().startProcessingFunctionExpression(functionExpression);
-        return this;
     }
 
     @Override
-    public TypeInferenceObserver startFirstPassParametersProcessing()
+    public void startFirstPassParametersProcessing()
     {
         activeObserver().startFirstPassParametersProcessing();
-        return this;
     }
 
     @Override
-    public TypeInferenceObserver processingParameter(CoreInstance functionExpression, int i, ValueSpecification value)
+    public void processingParameter(CoreInstance functionExpression, int i, ValueSpecification value)
     {
         activeObserver().processingParameter(functionExpression, i, value);
-        return this;
     }
 
     @Override
-    public TypeInferenceObserver inferenceResult(boolean success)
+    public void inferenceResult(boolean success)
     {
         activeObserver().inferenceResult(success);
-        return this;
     }
 
     @Override
-    public TypeInferenceObserver functionMatched(CoreInstance foundFunction, CoreInstance foundFunctionType)
+    public void functionMatched(CoreInstance foundFunction, CoreInstance foundFunctionType)
     {
         activeObserver().functionMatched(foundFunction, foundFunctionType);
-        return this;
     }
 
     @Override
-    public TypeInferenceObserver firstPassInferenceFailed()
+    public void firstPassInferenceFailed()
     {
         activeObserver().firstPassInferenceFailed();
-        return this;
     }
 
     @Override
-    public TypeInferenceObserver matchTypeParamsFromFoundFunction(CoreInstance foundFunction)
+    public void matchTypeParamsFromFoundFunction(CoreInstance foundFunction)
     {
         activeObserver().matchTypeParamsFromFoundFunction(foundFunction);
-        return this;
     }
 
     @Override
-    public TypeInferenceObserver register(CoreInstance templateGenType, CoreInstance valueForMetaPropertyToOne, TypeInferenceContext context, TypeInferenceContext targetGenericsContext)
+    public void register(CoreInstance templateGenType, CoreInstance valueForMetaPropertyToOne, TypeInferenceContext context, TypeInferenceContext targetGenericsContext)
     {
         activeObserver().register(templateGenType, valueForMetaPropertyToOne, context, targetGenericsContext);
-        return this;
     }
 
     @Override
-    public TypeInferenceObserver registerMul(CoreInstance templateMul, CoreInstance valueMul, TypeInferenceContext context, TypeInferenceContext targetGenericsContext)
+    public void registerMul(CoreInstance templateMul, CoreInstance valueMul, TypeInferenceContext context, TypeInferenceContext targetGenericsContext)
     {
         activeObserver().registerMul(templateMul, valueMul, context, targetGenericsContext);
-        return this;
     }
 
     @Override
-    public TypeInferenceObserver matchParam(int z)
+    public void matchParam(int z)
     {
         activeObserver().matchParam(z);
-        return this;
     }
 
     @Override
-    public TypeInferenceObserver paramInferenceFailed(int z)
+    public void paramInferenceFailed(int z)
     {
         activeObserver().paramInferenceFailed(z);
-        return this;
     }
 
     @Override
-    public TypeInferenceObserver reverseMatching()
+    public void reverseMatching()
     {
         activeObserver().reverseMatching();
-        return this;
     }
 
     @Override
-    public TypeInferenceObserver parameterInferenceSucceeded()
+    public void parameterInferenceSucceeded()
     {
         activeObserver().parameterInferenceSucceeded();
-        return this;
     }
 
     @Override
-    public TypeInferenceObserver returnType(CoreInstance returnGenericType)
+    public void returnType(CoreInstance returnGenericType)
     {
         activeObserver().returnType(returnGenericType);
-        return this;
     }
 
     @Override
-    public TypeInferenceObserver returnTypeNotConcrete()
+    public void returnTypeNotConcrete()
     {
         activeObserver().returnTypeNotConcrete();
-        return this;
     }
 
     @Override
-    public TypeInferenceObserver reprocessingTheParameter()
+    public void reprocessingTheParameter()
     {
         activeObserver().reprocessingTheParameter();
-        return this;
     }
 
     @Override
-    public TypeInferenceObserver finishedProcessParameter()
+    public void finishedProcessParameter()
     {
         activeObserver().finishedProcessParameter();
-        return this;
     }
 
     @Override
-    public TypeInferenceObserver newReturnType(CoreInstance returnGenericType)
+    public void newReturnType(CoreInstance returnGenericType)
     {
         activeObserver().newReturnType(returnGenericType);
-        return this;
     }
 
     @Override
-    public TypeInferenceObserver finishedRegisteringParametersAndMultiplicities()
+    public void finishedRegisteringParametersAndMultiplicities()
     {
         activeObserver().finishedRegisteringParametersAndMultiplicities();
-        return this;
     }
 
     @Override
-    public TypeInferenceObserver finishedProcessingFunctionExpression(CoreInstance functionExpression)
+    public void finishedProcessingFunctionExpression(CoreInstance functionExpression)
     {
         activeObserver().finishedProcessingFunctionExpression(functionExpression);
-        return this;
     }
 }

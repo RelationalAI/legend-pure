@@ -64,21 +64,25 @@ public class PrintTypeInferenceObserver implements TypeInferenceObserver
     }
 
     @Override
-    public TypeInferenceObserver resetTab()
+    public void resetTab()
     {
         this.tabCount = 0;
-        return this;
     }
 
     @Override
-    public TypeInferenceObserver shiftTab(int i)
+    public void shiftTab()
     {
-        this.tabCount = Math.max(0, this.tabCount + i);
-        return this;
+        this.tabCount++;
     }
 
     @Override
-    public TypeInferenceObserver startProcessingFunction(CoreInstance functionDefinition, CoreInstance functionType)
+    public void unShiftTab()
+    {
+        this.tabCount = Math.max(0, this.tabCount - 1);
+    }
+
+    @Override
+    public void startProcessingFunction(CoreInstance functionDefinition, CoreInstance functionType)
     {
         printTab().print("Process function '").print(((FunctionDefinition<?>) functionDefinition)._name());
         SourceInformation sourceInfo = functionDefinition.getSourceInformation();
@@ -88,31 +92,31 @@ public class PrintTypeInferenceObserver implements TypeInferenceObserver
         }
         print(" '(");
         FunctionType.print(this.appendable, functionType, this.processorState.getProcessorSupport());
-        return print(')').printNewline();
+        print(')').printNewline();
     }
 
     @Override
-    public TypeInferenceObserver startProcessingFunctionBody()
+    public void startProcessingFunctionBody()
     {
-        return printTab().print("Processing function body ").printTypeInferenceContext().printNewline();
+        printTab().print("Processing function body ").printTypeInferenceContext().printNewline();
     }
 
     @Override
-    public TypeInferenceObserver finishedProcessingFunctionBody()
+    public void finishedProcessingFunctionBody()
     {
-        return printTab().print("Finished processing function body").printNewline();
+        printTab().print("Finished processing function body").printNewline();
     }
 
     @Override
-    public TypeInferenceObserver finishedProcessingFunction(CoreInstance functionType)
+    public void finishedProcessingFunction(CoreInstance functionType)
     {
         printTab().print("Finished processing function / ");
         FunctionType.print(this.appendable, functionType, this.processorState.getProcessorSupport());
-        return printNewline();
+        printNewline();
     }
 
     @Override
-    public TypeInferenceObserver startProcessingFunctionExpression(CoreInstance functionExpression)
+    public void startProcessingFunctionExpression(CoreInstance functionExpression)
     {
         printTab().print("Process function expression for function: '").print(((FunctionExpression) functionExpression)._functionName());
         SourceInformation sourceInfo = functionExpression.getSourceInformation();
@@ -120,154 +124,154 @@ public class PrintTypeInferenceObserver implements TypeInferenceObserver
         {
             sourceInfo.appendM4String(this.appendable);
         }
-        return print("' ").printTypeInferenceContext().printNewline();
+        print("' ").printTypeInferenceContext().printNewline();
     }
 
     @Override
-    public TypeInferenceObserver startFirstPassParametersProcessing()
+    public void startFirstPassParametersProcessing()
     {
-        return printTab().print("- First pass parameters processing:").printNewline();
+        printTab().print("- First pass parameters processing:").printNewline();
     }
 
     @Override
-    public TypeInferenceObserver processingParameter(CoreInstance functionExpression, int i, ValueSpecification value)
+    public void processingParameter(CoreInstance functionExpression, int i, ValueSpecification value)
     {
         printTab().print("Process param: ").print(i + 1).print('/').print(((FunctionExpression) functionExpression)._parametersValues().size());
+        SourceInformation sourceInfo = value.getSourceInformation();
+        print(' ');
         if (value instanceof VariableExpression)
         {
-            print(' ').print(((VariableExpression) value)._name());
+            print(((VariableExpression) value)._name());
         }
-        SourceInformation sourceInfo = value.getSourceInformation();
         if (sourceInfo != null)
         {
-            print(' ');
             sourceInfo.appendM4String(this.appendable);
         }
-        return printNewline();
+        printNewline();
     }
 
     @Override
-    public TypeInferenceObserver inferenceResult(boolean success)
+    public void inferenceResult(boolean success)
     {
-        return printTab().print("-> inference (success:").print(success).print(")").printNewline();
+        printTab().print("-> inference (success:").print(success).print(")").printNewline();
     }
 
     @Override
-    public TypeInferenceObserver functionMatched(CoreInstance foundFunction, CoreInstance foundFunctionType)
+    public void functionMatched(CoreInstance foundFunction, CoreInstance foundFunctionType)
     {
         printTab().print("- Function matched: name:'").print(foundFunction.getName()).print("'  signature:'");
         FunctionType.print(this.appendable, foundFunctionType, this.processorState.getProcessorSupport());
-        return print('\'').printNewline();
+        print('\'').printNewline();
     }
 
     @Override
-    public TypeInferenceObserver firstPassInferenceFailed()
+    public void firstPassInferenceFailed()
     {
-        return printTab().print("- Parameters inference failed").printNewline();
+        printTab().print("- Parameters inference failed").printNewline();
     }
 
     @Override
-    public TypeInferenceObserver matchTypeParamsFromFoundFunction(CoreInstance foundFunction)
+    public void matchTypeParamsFromFoundFunction(CoreInstance foundFunction)
     {
-        return printTab().print("Matching type parameters and multiplicity parameters (from the found function '").print(foundFunction.getName()).print("')").printNewline();
+        printTab().print("Matching type parameters and multiplicity parameters (from the found function '").print(foundFunction.getName()).print("')").printNewline();
     }
 
     @Override
-    public TypeInferenceObserver register(CoreInstance templateGenType, CoreInstance valueForMetaPropertyToOne, TypeInferenceContext context, TypeInferenceContext targetGenericsContext)
+    public void register(CoreInstance templateGenType, CoreInstance valueForMetaPropertyToOne, TypeInferenceContext context, TypeInferenceContext targetGenericsContext)
     {
         printTab().print(". Register ");
         GenericType.print(this.appendable, templateGenType, this.processorState.getProcessorSupport());
         print(" / ");
         GenericType.print(this.appendable, valueForMetaPropertyToOne, this.processorState.getProcessorSupport());
         print(" in ").print(context.getId()).print("/").print(targetGenericsContext.getId()).print("   ");
-        return printTypeInferenceContext().printNewline();
+        printTypeInferenceContext().printNewline();
     }
 
     @Override
-    public TypeInferenceObserver registerMul(CoreInstance templateMul, CoreInstance valueMul, TypeInferenceContext context, TypeInferenceContext targetGenericsContext)
+    public void registerMul(CoreInstance templateMul, CoreInstance valueMul, TypeInferenceContext context, TypeInferenceContext targetGenericsContext)
     {
         printTab().print(". Register Mul ");
         Multiplicity.print(this.appendable, templateMul, true);
         print(" / ");
         Multiplicity.print(this.appendable, valueMul, true);
         print(" in ").print(context.getId()).print("/").print(targetGenericsContext.getId()).print("   ");
-        return printTypeInferenceContext().printNewline();
+        printTypeInferenceContext().printNewline();
     }
 
     @Override
-    public TypeInferenceObserver matchParam(int i)
+    public void matchParam(int z)
     {
-        return printTab().print(i + 1).print(". Match Param ").printNewline();
+        printTab().print(z).print(". Match Param ").printNewline();
     }
 
     @Override
-    public TypeInferenceObserver paramInferenceFailed(int i)
+    public void paramInferenceFailed(int z)
     {
-        return printTab().print(i + 1).print(". Failed processing").printNewline();
+        printTab().print(z).print(". Failed processing").printNewline();
     }
 
     @Override
-    public TypeInferenceObserver reverseMatching()
+    public void reverseMatching()
     {
-        return printTab().print("Reverse matching (fill the missing type param from the instances):").printNewline();
+        printTab().print("Reverse matching (fill the missing type param from the instances):").printNewline();
     }
 
     @Override
-    public TypeInferenceObserver parameterInferenceSucceeded()
+    public void parameterInferenceSucceeded()
     {
         printTab().print("- Parameters inference succeeded, registering type parameters and multiplicity parameters: ");
-        return printTypeInferenceContext().printNewline();
+        printTypeInferenceContext().printNewline();
     }
 
     @Override
-    public TypeInferenceObserver returnType(CoreInstance returnGenericType)
+    public void returnType(CoreInstance returnGenericType)
     {
         printTab().print("Return type '");
         GenericType.print(this.appendable, returnGenericType, this.processorState.getProcessorSupport());
-        return print('\'').printNewline();
+        print('\'').printNewline();
     }
 
     @Override
-    public TypeInferenceObserver returnTypeNotConcrete()
+    public void returnTypeNotConcrete()
     {
-        return printTab().print("The return type is not concrete (and not in global scope) -> reverse matching").printNewline();
+        printTab().print("The return type is not concrete (and not in global scope) -> reverse matching").printNewline();
     }
 
     @Override
-    public TypeInferenceObserver reprocessingTheParameter()
+    public void reprocessingTheParameter()
     {
-        return printTab().print("Reprocessing the parameter").printNewline();
+        printTab().print("Reprocessing the parameter").printNewline();
     }
 
     @Override
-    public TypeInferenceObserver finishedProcessParameter()
+    public void finishedProcessParameter()
     {
-        return printTab().print("Finished reprocessing the parameter").printNewline();
+        printTab().print("Finished reprocessing the parameter").printNewline();
     }
 
     @Override
-    public TypeInferenceObserver newReturnType(CoreInstance returnGenericType)
+    public void newReturnType(CoreInstance returnGenericType)
     {
         printTab().print("New return type '");
         GenericType.print(this.appendable, returnGenericType, this.processorState.getProcessorSupport());
-        return print('\'').printNewline();
+        print('\'').printNewline();
     }
 
     @Override
-    public TypeInferenceObserver finishedRegisteringParametersAndMultiplicities()
+    public void finishedRegisteringParametersAndMultiplicities()
     {
-        return printTab().print("- Finished registering type parameters and multiplicity parameters.").printNewline();
+        printTab().print("- Finished registering type parameters and multiplicity parameters.").printNewline();
     }
 
     @Override
-    public TypeInferenceObserver finishedProcessingFunctionExpression(CoreInstance functionExpression)
+    public void finishedProcessingFunctionExpression(CoreInstance functionExpression)
     {
         printTab().print("Finished processing: '").print(((FunctionExpression) functionExpression)._functionName());
-        return print("' ").printTypeInferenceContext().printNewline();
+        print("' ").printTypeInferenceContext().printNewline();
     }
 
 //    @Override
-//    public TypeInferenceObserver matchUntypedLambnda(CoreInstance functionExpression, CoreInstance templateGenericType)
+//    public void matchUntypedLambnda(CoreInstance functionExpression, CoreInstance templateGenericType)
 //    {
 //        printTab();
 //        print("Finished processing: '");

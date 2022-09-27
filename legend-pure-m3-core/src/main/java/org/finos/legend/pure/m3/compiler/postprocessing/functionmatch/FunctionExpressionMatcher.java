@@ -16,14 +16,13 @@ package org.finos.legend.pure.m3.compiler.postprocessing.functionmatch;
 
 import org.eclipse.collections.api.RichIterable;
 import org.eclipse.collections.api.factory.Lists;
-import org.eclipse.collections.api.factory.Maps;
 import org.eclipse.collections.api.factory.Sets;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
-import org.eclipse.collections.api.map.MutableMap;
+import org.eclipse.collections.api.multimap.list.MutableListMultimap;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.set.SetIterable;
-import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.impl.factory.Multimaps;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.function.Function;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.valuespecification.FunctionExpression;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.valuespecification.ValueSpecification;
@@ -32,7 +31,7 @@ import org.finos.legend.pure.m3.navigation.PackageableElement.PackageableElement
 import org.finos.legend.pure.m3.navigation.ProcessorSupport;
 import org.finos.legend.pure.m3.navigation._package._Package;
 import org.finos.legend.pure.m3.navigation.imports.Imports;
-import org.finos.legend.pure.m3.tools.ListHelper;
+import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.coreinstance.SourceInformation;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
 
@@ -56,23 +55,17 @@ public class FunctionExpressionMatcher
 
     public static <T extends Function<?>> ListIterable<T> getFunctionMatches(RichIterable<T> functionsToSearch, RichIterable<? extends ValueSpecification> parametersValues, String functionToFindName, SourceInformation sourceInformation, boolean lenient, ProcessorSupport processorSupport) throws PureCompilationException
     {
-        return getFunctionMatches(functionsToSearch, ListHelper.wrapListIterable(parametersValues), functionToFindName, sourceInformation, lenient, processorSupport);
-    }
-
-    public static <T extends Function<?>> ListIterable<T> getFunctionMatches(RichIterable<T> functionsToSearch, ListIterable<? extends ValueSpecification> parametersValues, String functionToFindName, SourceInformation sourceInformation, boolean lenient, ProcessorSupport processorSupport) throws PureCompilationException
-    {
+        MutableListMultimap<FunctionMatch, T> functionsByMatch = Multimaps.mutable.list.empty();
         try
         {
-            MutableMap<FunctionMatch, MutableList<T>> functionsByMatch = Maps.mutable.empty();
-            functionsToSearch.forEach(function ->
+            for (T function : functionsToSearch)
             {
-                FunctionMatch match = FunctionMatch.newFunctionMatch(function, functionToFindName, parametersValues, lenient, processorSupport);
+                FunctionMatch match = FunctionMatch.newFunctionMatch(function, functionToFindName, parametersValues.toList(), lenient, processorSupport);
                 if (match != null)
                 {
-                    functionsByMatch.getIfAbsentPut(match, Lists.mutable::empty).add(function);
+                    functionsByMatch.put(match, function);
                 }
-            });
-            return functionsByMatch.keyValuesView().toSortedListBy(Pair::getOne).flatCollect(Pair::getTwo);
+            }
         }
         catch (RuntimeException e)
         {
@@ -84,6 +77,13 @@ public class FunctionExpressionMatcher
             }
             throw new PureCompilationException(sourceInformation, message.toString(), e);
         }
+
+        MutableList<T> functionMatches = Lists.mutable.ofInitialCapacity(functionsByMatch.sizeDistinct());
+        for (FunctionMatch match : functionsByMatch.keysView().toSortedList())
+        {
+            functionMatches.addAllIterable(functionsByMatch.get(match));
+        }
+        return functionMatches;
     }
 
     public static <T extends Function<?>> T getBestFunctionMatch(RichIterable<T> functionsToSearch, ListIterable<? extends ValueSpecification> parametersValues, String functionToFindName, SourceInformation sourceInformation, boolean lenient, ProcessorSupport processorSupport) throws PureCompilationException
@@ -140,9 +140,12 @@ public class FunctionExpressionMatcher
         {
             StringBuilder message = new StringBuilder("Too many matches for ");
             org.finos.legend.pure.m3.navigation.functionexpression.FunctionExpression.printFunctionSignatureFromExpression(message, functionToFindName, parametersValues, processorSupport);
-            bestFunctions.collect(f -> org.finos.legend.pure.m3.navigation.function.Function.print(f, processorSupport))
-                    .sortThis()
-                    .appendString(message, ":\n\t", "\n\t", "");
+            MutableList<String> functionDescriptors = Lists.mutable.ofInitialCapacity(bestFunctions.size());
+            for (CoreInstance func : bestFunctions)
+            {
+                functionDescriptors.add(org.finos.legend.pure.m3.navigation.function.Function.print(func, processorSupport));
+            }
+            functionDescriptors.sortThis().appendString(message, ":\n\t", "\n\t", "");
             throw new PureCompilationException(sourceInformation, message.toString());
         }
 
@@ -152,7 +155,15 @@ public class FunctionExpressionMatcher
     private static RichIterable<Function<?>> getFunctionsWithMatchingName(String functionName, ListIterable<String> functionPackage, FunctionExpression functionExpression, ProcessorSupport processorSupport)
     {
         SetIterable<org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.PackageableElement> packages = getValidPackages(functionPackage, functionExpression, processorSupport);
-        return processorSupport.function_getFunctionsForName(functionName).collectIf(f -> packages.contains(((Function<?>) f)._package()), f -> (Function<?>) f, Lists.mutable.empty());
+        MutableList<Function<?>> functions = Lists.mutable.empty();
+        for (CoreInstance function : processorSupport.function_getFunctionsForName(functionName))
+        {
+            if (packages.contains(((Function<?>) function)._package()))
+            {
+                functions.add((Function<?>) function);
+            }
+        }
+        return functions;
     }
 
     private static SetIterable<org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.PackageableElement> getValidPackages(ListIterable<String> functionPackage, FunctionExpression functionExpression, ProcessorSupport processorSupport)
