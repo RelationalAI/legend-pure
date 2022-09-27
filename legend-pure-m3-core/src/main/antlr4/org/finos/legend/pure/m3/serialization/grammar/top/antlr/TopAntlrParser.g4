@@ -9,8 +9,5 @@ definition:     (top)*
                 EOF
 ;
 
-top:            CODE_BLOCK_START (sectionContent)*
-;
-
-sectionContent:         HASH | NON_HASH
+top:            CODE_BLOCK_START (CODE)*
 ;

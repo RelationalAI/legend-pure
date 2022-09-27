@@ -1,6 +1,6 @@
 lexer grammar RelationalLexer;
 
-import M3CoreLexer;
+import M3Lexer;
 
 AND : 'and' ;
 OR : 'or' ;

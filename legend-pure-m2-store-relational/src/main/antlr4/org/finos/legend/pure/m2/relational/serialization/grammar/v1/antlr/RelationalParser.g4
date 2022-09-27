@@ -1,6 +1,6 @@
 parser grammar RelationalParser;
 
-import M3CoreParser;
+import M3Parser;
 
 options
 {

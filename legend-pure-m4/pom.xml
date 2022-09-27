@@ -43,32 +43,8 @@
                             <visitor>true</visitor>
                             <listener>true</listener>
                             <libDirectory>
-                                src/main/antlr4/org/finos/legend/pure/m4/serialization/grammar/core
+                                ../legend-pure-m4/src/main/antlr4/org/finos/legend/pure/m4/serialization/grammar
                             </libDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-resources</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.outputDirectory}/antlr</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>
-                                        src/main/antlr4/org/finos/legend/pure/m4/serialization/grammar/core
-                                    </directory>
-                                    <filtering>true</filtering>
-                                </resource>
-                            </resources>
                         </configuration>
                     </execution>
                 </executions>
@@ -97,7 +73,7 @@
 
         <dependency>
             <groupId>org.antlr</groupId>
-            <artifactId>antlr4-runtime</artifactId>
+            <artifactId>antlr4</artifactId>
         </dependency>
 
         <dependency>
