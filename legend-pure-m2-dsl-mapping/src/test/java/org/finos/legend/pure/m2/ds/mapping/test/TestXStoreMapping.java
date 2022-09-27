@@ -22,8 +22,7 @@ import org.junit.Test;
 public class TestXStoreMapping extends AbstractPureMappingTestWithCoreCompiled
 {
     @BeforeClass
-    public static void setUp()
-    {
+    public static void setUp() {
         setUpRuntime();
     }
 
@@ -85,8 +84,8 @@ public class TestXStoreMapping extends AbstractPureMappingTestWithCoreCompiled
                 "      employees[f1, e] : $this.id == $that.firmId\n" +
                 "   }\n" +
                 ")\n";
-        runtime.createInMemorySource("mapping.pure", source);
-        runtime.compile();
+        this.runtime.createInMemorySource("mapping.pure", source);
+        this.runtime.compile();
         assertSetSourceInformation(source, "Firm");
         assertSetSourceInformation(source, "Person");
         assertSetSourceInformation(source, "Firm_Person");
@@ -95,7 +94,7 @@ public class TestXStoreMapping extends AbstractPureMappingTestWithCoreCompiled
     @Test
     public void testXStoreMappingTypeError()
     {
-        runtime.createInMemorySource("mapping.pure",
+        this.runtime.createInMemorySource("mapping.pure",
                 "Class Firm\n" +
                         "{\n" +
                         "   legalName : String[1];\n" +
@@ -147,7 +146,7 @@ public class TestXStoreMapping extends AbstractPureMappingTestWithCoreCompiled
                         ")\n");
         try
         {
-            runtime.compile();
+            this.runtime.compile();
             Assert.fail();
         }
         catch (Exception e)
@@ -208,8 +207,8 @@ public class TestXStoreMapping extends AbstractPureMappingTestWithCoreCompiled
                 "      employees[f1, e] : $this.id->toOne() == $that.firmId\n" +
                 "   }\n" +
                 ")\n";
-        runtime.createInMemorySource("mapping.pure", source);
-        runtime.compile();
+        this.runtime.createInMemorySource("mapping.pure", source);
+        this.runtime.compile();
         assertSetSourceInformation(source, "Firm");
         assertSetSourceInformation(source, "Person");
         assertSetSourceInformation(source, "Firm_Person");
@@ -278,8 +277,8 @@ public class TestXStoreMapping extends AbstractPureMappingTestWithCoreCompiled
                 "      employees[f1, MyPerson] : $this.id->toOne() == $that.firmId\n" +
                 "   }\n" +
                 ")\n";
-        runtime.createInMemorySource("mapping.pure", source);
-        runtime.compile();
+        this.runtime.createInMemorySource("mapping.pure", source);
+        this.runtime.compile();
         assertSetSourceInformation(source, "Firm");
         assertSetSourceInformation(source, "Person");
         assertSetSourceInformation(source, "Firm_MyPerson");

@@ -14,12 +14,11 @@
 
 package org.finos.legend.pure.m3.compiler.postprocessing.processor;
 
+import org.finos.legend.pure.m3.navigation.M3Paths;
 import org.finos.legend.pure.m3.compiler.Context;
 import org.finos.legend.pure.m3.compiler.postprocessing.ProcessorState;
-import org.finos.legend.pure.m3.compiler.postprocessing.ProcessorState.VariableContextScope;
-import org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.function.FunctionDefinition;
+import org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.function.LambdaFunction;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.type.Unit;
-import org.finos.legend.pure.m3.navigation.M3Paths;
 import org.finos.legend.pure.m3.navigation.ProcessorSupport;
 import org.finos.legend.pure.m3.tools.matcher.Matcher;
 import org.finos.legend.pure.m4.ModelRepository;
@@ -30,26 +29,24 @@ import org.finos.legend.pure.m4.ModelRepository;
 public class UnitProcessor extends Processor<Unit>
 {
     @Override
-    public String getClassName()
-    {
-        return M3Paths.Unit;
-    }
-
-    @Override
     public void process(Unit instance, ProcessorState state, Matcher matcher, ModelRepository repository, Context context, ProcessorSupport processorSupport)
     {
-        FunctionDefinition<?> conversionFunction = instance._conversionFunction();
-        if (conversionFunction != null)
+        if (null != instance._conversionFunction())
         {
-            try (VariableContextScope ignore = state.withNewVariableContext())
-            {
-                FunctionDefinitionProcessor.process(conversionFunction, state, matcher, repository);
-            }
+            state.pushVariableContext();
+            FunctionDefinitionProcessor.process((LambdaFunction)instance._conversionFunction(), state, matcher, repository);
+            state.popVariableContext();
         }
     }
 
     @Override
     public void populateReferenceUsages(Unit unit, ModelRepository repository, ProcessorSupport processorSupport)
     {
+    }
+
+    @Override
+    public String getClassName()
+    {
+        return M3Paths.Unit;
     }
 }

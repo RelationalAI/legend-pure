@@ -24,7 +24,6 @@ import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.eclipse.collections.impl.utility.LazyIterate;
 import org.finos.legend.pure.m3.compiler.postprocessing.ProcessorState;
-import org.finos.legend.pure.m3.compiler.postprocessing.ProcessorState.VariableContextScope;
 import org.finos.legend.pure.m3.compiler.postprocessing.processor.FunctionDefinitionProcessor;
 import org.finos.legend.pure.m3.compiler.postprocessing.processor.LambdaFunctionProcessor;
 import org.finos.legend.pure.m3.compiler.postprocessing.processor.valuespecification.InstanceValueProcessor;
@@ -142,11 +141,10 @@ public class TypeInference
                     param._multiplicity((Multiplicity) org.finos.legend.pure.m3.navigation.multiplicity.Multiplicity.copyMultiplicity(multiplicity, param.getSourceInformation(), processorSupport));
                 }
             }
-            try (VariableContextScope ignore = state.withNewVariableContext())
-            {
-                FunctionDefinitionProcessor.process(lambdaFunction, state, matcher, repository);
-                LambdaFunctionProcessor.process(lambdaFunction, state, matcher, repository);
-            }
+            state.pushVariableContext();
+            FunctionDefinitionProcessor.process(lambdaFunction, state, matcher, repository);
+            LambdaFunctionProcessor.process(lambdaFunction, state, matcher, repository);
+            state.popVariableContext();
         }
         else
         {

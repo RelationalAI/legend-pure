@@ -14,18 +14,22 @@
 
 package org.finos.legend.pure.m2.dsl.mapping.serialization.grammar.v1.processor;
 
-import org.eclipse.collections.api.factory.Lists;
+import org.eclipse.collections.api.RichIterable;
+import org.eclipse.collections.api.block.function.Function;
+import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.map.MapIterable;
+import org.eclipse.collections.impl.factory.Lists;
 import org.finos.legend.pure.m2.dsl.mapping.M2MappingPaths;
+import org.finos.legend.pure.m2.dsl.mapping.serialization.grammar.v1.processor.PropertyMappingProcessor;
 import org.finos.legend.pure.m2.dsl.mapping.serialization.grammar.v1.validator.MappingValidator;
+import org.finos.legend.pure.m3.navigation.M3Paths;
 import org.finos.legend.pure.m3.compiler.Context;
 import org.finos.legend.pure.m3.compiler.postprocessing.ProcessorState;
-import org.finos.legend.pure.m3.compiler.postprocessing.ProcessorState.VariableContextScope;
 import org.finos.legend.pure.m3.compiler.postprocessing.processor.Processor;
+import org.finos.legend.pure.m3.navigation.importstub.ImportStub;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.mapping.InstanceSetImplementation;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.mapping.Mapping;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.mapping.MappingClass;
-import org.finos.legend.pure.m3.coreinstance.meta.pure.mapping.PropertyMapping;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.mapping.PropertyMappingValueSpecificationContext;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.mapping.SetImplementation;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.mapping.xStore.XStoreAssociationImplementation;
@@ -37,10 +41,9 @@ import org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.type.FunctionTy
 import org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.type.generics.GenericType;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.valuespecification.ValueSpecification;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.valuespecification.VariableExpression;
-import org.finos.legend.pure.m3.navigation.M3Paths;
 import org.finos.legend.pure.m3.navigation.ProcessorSupport;
-import org.finos.legend.pure.m3.navigation.importstub.ImportStub;
 import org.finos.legend.pure.m3.tools.matcher.Matcher;
+import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.ModelRepository;
 
 public class XStoreProcessor extends Processor<XStoreAssociationImplementation>
@@ -59,43 +62,52 @@ public class XStoreProcessor extends Processor<XStoreAssociationImplementation>
         MapIterable<String, SetImplementation> setImpl = org.finos.legend.pure.m2.dsl.mapping.Mapping.getClassMappingsByIdIncludeEmbedded(mapping, processorSupport);
 
         int i = 0;
-        for (PropertyMapping pm : instance._propertyMappings())
+        for (XStorePropertyMapping propertyMapping : (RichIterable<XStorePropertyMapping>) instance._propertyMappings())
         {
-            XStorePropertyMapping propertyMapping = (XStorePropertyMapping) pm;
             PropertyMappingProcessor.processPropertyMapping(propertyMapping, repository, processorSupport, association, instance);
-            try (VariableContextScope ignore = state.withNewVariableContext())
+            state.pushVariableContext();
+
+            InstanceSetImplementation sourceSetImpl = (InstanceSetImplementation) MappingValidator.validateId(instance, propertyMapping, setImpl, propertyMapping._sourceSetImplementationId(), "source", processorSupport);
+            InstanceSetImplementation targetSetImpl = (InstanceSetImplementation) MappingValidator.validateId(instance, propertyMapping, setImpl, propertyMapping._targetSetImplementationId(), "target", processorSupport);
+
+            Class srcClass = getSetImplementationClass(sourceSetImpl, processorSupport);
+            Class targetClass = getSetImplementationClass(targetSetImpl, processorSupport);
+            VariableExpression thisParam = this.buildParam("this", srcClass, repository, processorSupport);
+            VariableExpression thatParam = this.buildParam("that", targetClass, repository, processorSupport);
+            FunctionType fType = (FunctionType) ImportStub.withImportStubByPass(
+                    propertyMapping._crossExpression()._classifierGenericType()._typeArguments().collect(new Function<GenericType, CoreInstance>()
             {
-                InstanceSetImplementation sourceSetImpl = (InstanceSetImplementation) MappingValidator.validateId(instance, propertyMapping, setImpl, propertyMapping._sourceSetImplementationId(), "source", processorSupport);
-                InstanceSetImplementation targetSetImpl = (InstanceSetImplementation) MappingValidator.validateId(instance, propertyMapping, setImpl, propertyMapping._targetSetImplementationId(), "target", processorSupport);
-
-                Class<?> srcClass = getSetImplementationClass(sourceSetImpl, processorSupport);
-                Class<?> targetClass = getSetImplementationClass(targetSetImpl, processorSupport);
-                VariableExpression thisParam = buildParam("this", srcClass, repository, processorSupport);
-                VariableExpression thatParam = buildParam("that", targetClass, repository, processorSupport);
-                FunctionType fType = (FunctionType) ImportStub.withImportStubByPass(propertyMapping._crossExpression()._classifierGenericType()._typeArguments().getOnly()._rawTypeCoreInstance(), processorSupport);
-                fType._parametersAddAll(Lists.immutable.with(thisParam, thatParam));
-                matcher.fullMatch(propertyMapping._crossExpression(), state);
-
-                ValueSpecification expressionSequence = propertyMapping._crossExpression()._expressionSequence().toList().getFirst();
-                if (expressionSequence != null)
+                @Override
+                public CoreInstance valueOf(GenericType genericType)
                 {
-                    PropertyMappingValueSpecificationContext usageContext = (PropertyMappingValueSpecificationContext) processorSupport.newAnonymousCoreInstance(null, M2MappingPaths.PropertyMappingValueSpecificationContext);
-                    usageContext._offset(i);
-                    usageContext._propertyMapping(propertyMapping);
-                    expressionSequence._usageContext(usageContext);
+                    return genericType._rawTypeCoreInstance();
                 }
-                i++;
+            }).toList().get(0), processorSupport);
+            fType._parameters(Lists.immutable.withAll((ImmutableList<VariableExpression>)fType._parameters()).newWithAll(Lists.immutable.with(thisParam)));
+            fType._parameters(Lists.immutable.withAll((ImmutableList<VariableExpression>)fType._parameters()).newWithAll(Lists.immutable.with(thatParam)));
+            matcher.fullMatch(propertyMapping._crossExpression(), state);
+
+            ValueSpecification expressionSequence = propertyMapping._crossExpression()._expressionSequence().toList().getFirst();
+            if (expressionSequence != null)
+            {
+                PropertyMappingValueSpecificationContext usageContext = (PropertyMappingValueSpecificationContext)processorSupport.newAnonymousCoreInstance(null, M2MappingPaths.PropertyMappingValueSpecificationContext);
+                usageContext._offset(i);
+                usageContext._propertyMapping(propertyMapping);
+                expressionSequence._usageContext(usageContext);
             }
+            i++;
+
+            state.popVariableContext();
         }
     }
 
-    private Class<?> getSetImplementationClass(InstanceSetImplementation setImplementation, ProcessorSupport processorSupport)
+    private Class getSetImplementationClass(InstanceSetImplementation setImplementation, ProcessorSupport processorSupport)
     {
-        MappingClass<?> mappingClass = setImplementation._mappingClass();
-        return mappingClass == null ? (Class<?>) ImportStub.withImportStubByPass(setImplementation._classCoreInstance(), processorSupport) : mappingClass;
+        MappingClass mappingClass = setImplementation._mappingClass();
+        return mappingClass == null ? (Class) ImportStub.withImportStubByPass(setImplementation._classCoreInstance(),processorSupport) : mappingClass;
     }
 
-    private VariableExpression buildParam(String name, Class<?> type, ModelRepository repository, ProcessorSupport processorSupport)
+    private VariableExpression buildParam(String name, Class type, ModelRepository repository, ProcessorSupport processorSupport)
     {
         GenericType genericType = (GenericType) repository.newAnonymousCoreInstance(null, processorSupport.package_getByUserPath(M3Paths.GenericType));
         genericType._rawTypeCoreInstance(type);

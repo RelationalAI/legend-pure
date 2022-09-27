@@ -30,55 +30,38 @@ import org.finos.legend.pure.m4.tools.SafeAppendable;
 public class PrintTypeInferenceObserver implements TypeInferenceObserver
 {
     private final SafeAppendable appendable;
-    private int tabCount;
-    private final String tab;
+    private int tab;
+    private final ProcessorSupport processorSupport;
     private final ProcessorState processorState;
 
-    public PrintTypeInferenceObserver(Appendable appendable, String tab, ProcessorState processorState)
+    public PrintTypeInferenceObserver(Appendable appendable, ProcessorSupport processorSupport, ProcessorState processorState)
     {
         this.appendable = SafeAppendable.wrap(appendable);
-        this.tab = tab;
+        this.processorSupport = processorSupport;
         this.processorState = processorState;
     }
 
-    public PrintTypeInferenceObserver(Appendable appendable, ProcessorState processorState)
-    {
-        this(appendable, "  ", processorState);
-    }
-
-    public PrintTypeInferenceObserver(ProcessorState processorState)
-    {
-        this(System.out, processorState);
-    }
-
-    @Deprecated
-    public PrintTypeInferenceObserver(Appendable appendable, ProcessorSupport processorSupport, ProcessorState processorState)
-    {
-        this(appendable, processorState);
-    }
-
-    @Deprecated
     public PrintTypeInferenceObserver(ProcessorSupport processorSupport, ProcessorState processorState)
     {
-        this(processorState);
+        this(System.out, processorSupport, processorState);
     }
 
     @Override
     public void resetTab()
     {
-        this.tabCount = 0;
+        this.tab = 0;
     }
 
     @Override
     public void shiftTab()
     {
-        this.tabCount++;
+        this.tab += 2;
     }
 
     @Override
     public void unShiftTab()
     {
-        this.tabCount = Math.max(0, this.tabCount - 1);
+        this.tab = Math.max(0, this.tab - 2);
     }
 
     @Override
@@ -91,7 +74,7 @@ public class PrintTypeInferenceObserver implements TypeInferenceObserver
             sourceInfo.appendM4String(this.appendable);
         }
         print(" '(");
-        FunctionType.print(this.appendable, functionType, this.processorState.getProcessorSupport());
+        FunctionType.print(this.appendable, functionType, this.processorSupport);
         print(')').printNewline();
     }
 
@@ -111,7 +94,7 @@ public class PrintTypeInferenceObserver implements TypeInferenceObserver
     public void finishedProcessingFunction(CoreInstance functionType)
     {
         printTab().print("Finished processing function / ");
-        FunctionType.print(this.appendable, functionType, this.processorState.getProcessorSupport());
+        FunctionType.print(this.appendable, functionType, this.processorSupport);
         printNewline();
     }
 
@@ -160,7 +143,7 @@ public class PrintTypeInferenceObserver implements TypeInferenceObserver
     public void functionMatched(CoreInstance foundFunction, CoreInstance foundFunctionType)
     {
         printTab().print("- Function matched: name:'").print(foundFunction.getName()).print("'  signature:'");
-        FunctionType.print(this.appendable, foundFunctionType, this.processorState.getProcessorSupport());
+        FunctionType.print(this.appendable, foundFunctionType, this.processorSupport);
         print('\'').printNewline();
     }
 
@@ -180,9 +163,9 @@ public class PrintTypeInferenceObserver implements TypeInferenceObserver
     public void register(CoreInstance templateGenType, CoreInstance valueForMetaPropertyToOne, TypeInferenceContext context, TypeInferenceContext targetGenericsContext)
     {
         printTab().print(". Register ");
-        GenericType.print(this.appendable, templateGenType, this.processorState.getProcessorSupport());
+        GenericType.print(this.appendable, templateGenType, this.processorSupport);
         print(" / ");
-        GenericType.print(this.appendable, valueForMetaPropertyToOne, this.processorState.getProcessorSupport());
+        GenericType.print(this.appendable, valueForMetaPropertyToOne, this.processorSupport);
         print(" in ").print(context.getId()).print("/").print(targetGenericsContext.getId()).print("   ");
         printTypeInferenceContext().printNewline();
     }
@@ -227,7 +210,7 @@ public class PrintTypeInferenceObserver implements TypeInferenceObserver
     public void returnType(CoreInstance returnGenericType)
     {
         printTab().print("Return type '");
-        GenericType.print(this.appendable, returnGenericType, this.processorState.getProcessorSupport());
+        GenericType.print(this.appendable, returnGenericType, this.processorSupport);
         print('\'').printNewline();
     }
 
@@ -253,7 +236,7 @@ public class PrintTypeInferenceObserver implements TypeInferenceObserver
     public void newReturnType(CoreInstance returnGenericType)
     {
         printTab().print("New return type '");
-        GenericType.print(this.appendable, returnGenericType, this.processorState.getProcessorSupport());
+        GenericType.print(this.appendable, returnGenericType, this.processorSupport);
         print('\'').printNewline();
     }
 
@@ -283,9 +266,9 @@ public class PrintTypeInferenceObserver implements TypeInferenceObserver
 
     private PrintTypeInferenceObserver printTab()
     {
-        for (int i = 0; i < this.tabCount; i++)
+        for (int i = 0; i < this.tab; i++)
         {
-            this.appendable.append(this.tab);
+            this.appendable.append(' ');
         }
         return this;
     }

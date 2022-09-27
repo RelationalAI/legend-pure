@@ -28,9 +28,6 @@ import org.finos.legend.pure.m3.compiler.postprocessing.inference.TestTypeInfere
 import org.finos.legend.pure.m3.compiler.postprocessing.inference.TypeInferenceContext;
 import org.finos.legend.pure.m3.compiler.postprocessing.inference.TypeInferenceObserver;
 import org.finos.legend.pure.m3.compiler.postprocessing.inference.VoidTypeInferenceObserver;
-import org.finos.legend.pure.m3.compiler.postprocessing.observer.CombinedPostProcessorObserver;
-import org.finos.legend.pure.m3.compiler.postprocessing.observer.PostProcessorObserver;
-import org.finos.legend.pure.m3.compiler.postprocessing.observer.VoidPostProcessorObserver;
 import org.finos.legend.pure.m3.compiler.postprocessing.processor.milestoning.MilestoningDates;
 import org.finos.legend.pure.m3.navigation.ProcessorSupport;
 import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.CodeStorage;
@@ -49,31 +46,36 @@ public class ProcessorState extends MatcherState
     private final MutableStack<Pair<ListIterable<String>, MilestoningDates>> milestoningDates = Stacks.mutable.empty();
     private final MutableSet<CoreInstance> functionDefinitions = Sets.mutable.empty();
     private final Message message;
+    private int count;
     private final ParserLibrary parserLibrary;
     private final InlineDSLLibrary inlineDSLLibrary;
-    private final PostProcessorObserver postProcessorObserver;
-    private final TypeInferenceObserver typeInferenceObserver;
+    private final TypeInferenceObserver observer;
     private final URLPatternLibrary URLPatternLibrary;
     private final SourceMutation sourceMutation = new SourceMutation();
     private final CodeStorage codeStorage;
 
-    public ProcessorState(VariableContext variableContext, ParserLibrary parserLibrary, InlineDSLLibrary inlineDSLLibrary, ProcessorSupport processorSupport, URLPatternLibrary URLPatternLibrary, CodeStorage codeStorage, Message message, PostProcessorObserver observer)
+    public ProcessorState(VariableContext variableContext, ParserLibrary parserLibrary, InlineDSLLibrary inlineDSLLibrary, ProcessorSupport processorSupport, URLPatternLibrary URLPatternLibrary, CodeStorage codeStorage, Message message)
     {
         super(processorSupport);
         this.variableContext = (variableContext == null) ? VariableContext.newVariableContext() : variableContext;
-        this.parserLibrary = parserLibrary;
         this.message = message;
+        this.parserLibrary = parserLibrary;
         this.inlineDSLLibrary = inlineDSLLibrary;
-        this.postProcessorObserver = getPostProcessorObserver(message, observer);
-        this.typeInferenceObserver = getTypeInferenceObserver(this);
+        if (Boolean.getBoolean("pure.typeinference.print"))
+        {
+            this.observer = new PrintTypeInferenceObserver(processorSupport, this);
+        }
+        else if (Boolean.getBoolean("pure.typeinference.test"))
+        {
+            this.observer = new TestTypeInferenceObserver(processorSupport, this);
+        }
+        else
+        {
+            this.observer = new VoidTypeInferenceObserver();
+        }
         this.URLPatternLibrary = URLPatternLibrary;
         this.newTypeInferenceContext(null);
         this.codeStorage = codeStorage;
-    }
-
-    public ProcessorState(VariableContext variableContext, ParserLibrary parserLibrary, InlineDSLLibrary inlineDSLLibrary, ProcessorSupport processorSupport, URLPatternLibrary URLPatternLibrary, CodeStorage codeStorage, Message message)
-    {
-        this(variableContext, parserLibrary, inlineDSLLibrary, processorSupport, URLPatternLibrary, codeStorage, message, null);
     }
 
     public CodeStorage getCodeStorage()
@@ -86,37 +88,18 @@ public class ProcessorState extends MatcherState
         return this.variableContext;
     }
 
-    @Deprecated
     public void pushVariableContext()
     {
-        pushNewVariableContext();
+        this.variableContext = VariableContext.newVariableContext(this.variableContext);
     }
 
-    @Deprecated
     public void popVariableContext()
     {
-        popVariableContext(this.variableContext);
-    }
-
-    void resetVariableContext()
-    {
-        this.variableContext = VariableContext.newVariableContext();
-    }
-
-    private VariableContext pushNewVariableContext()
-    {
-        return this.variableContext = VariableContext.newVariableContext(this.variableContext);
-    }
-
-    private void popVariableContext(VariableContext context)
-    {
-        if (this.variableContext != context)
+        this.variableContext = this.variableContext.getParent();
+        if (this.variableContext == null)
         {
-            // TODO should we throw or just not do anything?
-            throw new IllegalStateException("Variable context mismatch");
+            this.variableContext = VariableContext.newVariableContext();
         }
-        VariableContext parent = context.getParent();
-        this.variableContext = (parent == null) ? VariableContext.newVariableContext() : parent;
     }
 
     public void addFunctionDefinition(CoreInstance lambda)
@@ -129,30 +112,23 @@ public class ProcessorState extends MatcherState
         return this.functionDefinitions.asUnmodifiable();
     }
 
+    public void resetVariableContext()
+    {
+        this.variableContext = VariableContext.newVariableContext();
+    }
+
     public void noteProcessed(CoreInstance instance)
     {
         instance.markProcessed();
     }
 
-    public void startProcessing(CoreInstance instance)
-    {
-        this.postProcessorObserver.startProcessing(instance);
-        noteProcessed(instance);
-    }
-
-    public void finishProcessing(CoreInstance instance, Exception e)
-    {
-        this.postProcessorObserver.finishProcessing(instance, e);
-    }
-
-    public void finishProcessing(CoreInstance instance)
-    {
-        finishProcessing(instance, null);
-    }
-
-    @Deprecated
     public void incAndPushCount()
     {
+        if (this.message != null)
+        {
+            this.count++;
+            this.message.setMessage(String.format("Binding (%,d)", this.count));
+        }
     }
 
     public URLPatternLibrary getURLPatternLibrary()
@@ -168,7 +144,7 @@ public class ProcessorState extends MatcherState
         }
         else
         {
-            this.typeInferenceObserver.shiftTab();
+            this.observer.shiftTab();
             TypeInferenceContext tc = this.typeInferenceContext.pop();
             this.typeInferenceContext.push(new TypeInferenceContext(tc, this.processorSupport));
         }
@@ -183,12 +159,13 @@ public class ProcessorState extends MatcherState
 
     public void popTypeInferenceContextAhead()
     {
-        this.typeInferenceObserver.unShiftTab();
+        this.observer.unShiftTab();
         TypeInferenceContext tc = this.typeInferenceContext.pop();
         if (tc.getParent() != null)
         {
             this.typeInferenceContext.push(tc.getParent());
         }
+
     }
 
     public void popTypeInferenceContext()
@@ -206,19 +183,19 @@ public class ProcessorState extends MatcherState
 
     public void newTypeInferenceContext(CoreInstance owner)
     {
-        this.typeInferenceObserver.resetTab();
+        this.observer.resetTab();
         this.typeInferenceContext.push(new TypeInferenceContext(owner, this.processorSupport));
     }
 
     public void deleteTypeInferenceContext()
     {
-        this.typeInferenceObserver.resetTab();
+        this.observer.resetTab();
         this.typeInferenceContext.pop();
     }
 
     public TypeInferenceObserver getObserver()
     {
-        return this.typeInferenceObserver;
+        return this.observer;
     }
 
     public Message getMessage()
@@ -277,67 +254,5 @@ public class ProcessorState extends MatcherState
     public void popMilestoneDateContext()
     {
         this.milestoningDates.pop();
-    }
-
-    public VariableContextScope withNewVariableContext()
-    {
-        return new VariableContextScope();
-    }
-
-    public class VariableContextScope implements AutoCloseable
-    {
-        private final VariableContext variableContext;
-
-        private VariableContextScope()
-        {
-            this.variableContext = pushNewVariableContext();
-        }
-
-        @Override
-        public void close()
-        {
-            popVariableContext(this.variableContext);
-        }
-    }
-
-    private static TypeInferenceObserver getTypeInferenceObserver(ProcessorState processorState)
-    {
-        if (Boolean.getBoolean("pure.typeinference.print"))
-        {
-            return new PrintTypeInferenceObserver(processorState);
-        }
-        if (Boolean.getBoolean("pure.typeinference.test"))
-        {
-            return new TestTypeInferenceObserver(processorState);
-        }
-        return new VoidTypeInferenceObserver();
-    }
-
-    private static PostProcessorObserver getPostProcessorObserver(Message message, PostProcessorObserver observer)
-    {
-        if (message == null)
-        {
-            return (observer == null) ? new VoidPostProcessorObserver() : observer;
-        }
-
-        MessageObserver messageObserver = new MessageObserver(message);
-        return (observer == null) ? messageObserver : CombinedPostProcessorObserver.combine(messageObserver, observer);
-    }
-
-    private static class MessageObserver implements PostProcessorObserver
-    {
-        private final Message message;
-        private int count = 0;
-
-        private MessageObserver(Message message)
-        {
-            this.message = message;
-        }
-
-        @Override
-        public void startProcessing(CoreInstance instance)
-        {
-            this.message.setMessage(String.format("Binding (%,d)", ++this.count));
-        }
     }
 }

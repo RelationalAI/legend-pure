@@ -20,7 +20,6 @@ import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.set.MutableSet;
 import org.finos.legend.pure.m3.SourceMutation;
 import org.finos.legend.pure.m3.compiler.Context;
-import org.finos.legend.pure.m3.compiler.postprocessing.observer.PostProcessorObserver;
 import org.finos.legend.pure.m3.compiler.postprocessing.processor.AssociationProcessor;
 import org.finos.legend.pure.m3.compiler.postprocessing.processor.milestoning.MilestoningClassProcessor;
 import org.finos.legend.pure.m3.compiler.postprocessing.processor.milestoning.MilestoningPropertyProcessor;
@@ -51,11 +50,6 @@ public class PostProcessor
 {
     public static SourceMutation process(Iterable<? extends CoreInstance> newInstancesConsolidated, ModelRepository modelRepository, ParserLibrary parserLibrary, InlineDSLLibrary inlineDSLLibrary, CodeStorage codeStorage, Context context, ProcessorSupport processorSupport, URLPatternLibrary URLPatternLibrary, Message message) throws PureCompilationException
     {
-        return process(newInstancesConsolidated, modelRepository, parserLibrary, inlineDSLLibrary, codeStorage, context, processorSupport, URLPatternLibrary, message, null);
-    }
-
-    public static SourceMutation process(Iterable<? extends CoreInstance> newInstancesConsolidated, ModelRepository modelRepository, ParserLibrary parserLibrary, InlineDSLLibrary inlineDSLLibrary, CodeStorage codeStorage, Context context, ProcessorSupport processorSupport, URLPatternLibrary URLPatternLibrary, Message message, PostProcessorObserver observer) throws PureCompilationException
-    {
         CoreInstance concreteFunctionDefinition = processorSupport.package_getByUserPath(M3Paths.ConcreteFunctionDefinition);
         CoreInstance nativeFunction = processorSupport.package_getByUserPath(M3Paths.NativeFunction);
         MutableSet<CoreInstance> set = Sets.mutable.with(concreteFunctionDefinition, nativeFunction);
@@ -76,7 +70,7 @@ public class PostProcessor
         addMatchersComingFromParsers(parserLibrary, matcher);
         inlineDSLLibrary.getInlineDSLs().forEach(dsl -> dsl.getProcessors().forEach(matcher::addMatchIfTypeIsKnown));
 
-        ProcessorState state = new ProcessorState(VariableContext.newVariableContext(), parserLibrary, inlineDSLLibrary, processorSupport, URLPatternLibrary, codeStorage, message, observer);
+        ProcessorState state = new ProcessorState(VariableContext.newVariableContext(), parserLibrary, inlineDSLLibrary, processorSupport, URLPatternLibrary, codeStorage, message);
         allInstancesConsolidated.forEach(coreInstance ->
         {
             state.resetVariableContext();
@@ -165,20 +159,17 @@ public class PostProcessor
     {
         if (!instance.hasBeenProcessed())
         {
-            state.startProcessing(instance);
-            try (ProcessorState.VariableContextScope ignore = state.withNewVariableContext())
+            state.incAndPushCount();
+            instance.markProcessed();
+
+            state.pushVariableContext();
+
+            if (!matcher.match(instance, state))
             {
-                if (!matcher.match(instance, state))
-                {
-                    instance.markNotProcessed();
-                }
+                instance.markNotProcessed();
             }
-            catch (Exception e)
-            {
-                state.finishProcessing(instance, e);
-                throw e;
-            }
-            state.finishProcessing(instance);
+
+            state.popVariableContext();
 
             GenericTypeValidator.validateClassifierGenericTypeForInstance(instance, false, processorSupport);
         }
