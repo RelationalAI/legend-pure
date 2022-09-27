@@ -45,8 +45,6 @@ import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.classpa
 
 public abstract class PureIDEServer extends Application<ServerConfiguration>
 {
-    private PureSession pureSession;
-
     @Override
     public void initialize(Bootstrap<ServerConfiguration> bootstrap)
     {
@@ -74,7 +72,7 @@ public abstract class PureIDEServer extends Application<ServerConfiguration>
                         (configuration.swagger.getContextRoot().endsWith("/") ? "" : "/") + "api")
         );
 
-        this.pureSession = new PureSession(configuration.sourceLocationConfiguration, this.getRepositories(configuration.sourceLocationConfiguration));
+        PureSession pureSession = new PureSession(configuration.sourceLocationConfiguration, this.getRepositories(configuration.sourceLocationConfiguration));
 
         environment.jersey().register(new Concept(pureSession));
 
@@ -92,12 +90,6 @@ public abstract class PureIDEServer extends Application<ServerConfiguration>
         environment.jersey().register(new Service(pureSession));
 
         enableCors(environment);
-
-        postInit();
-    }
-
-    protected void postInit()
-    {
     }
 
     private void enableCors(Environment environment)
@@ -121,11 +113,6 @@ public abstract class PureIDEServer extends Application<ServerConfiguration>
                 .withoutAll(fromIde.flatCollect(RepositoryCodeStorage::getRepositories));
 
         return fromIde.with(new ClassLoaderCodeStorage(fromClassPath));
-    }
-
-    public PureSession getPureSession()
-    {
-        return pureSession;
     }
 
     protected abstract MutableList<RepositoryCodeStorage> buildRepositories(SourceLocationConfiguration sourceLocationConfiguration);
