@@ -24,6 +24,7 @@ import org.eclipse.collections.impl.block.function.checked.CheckedFunction;
 import org.eclipse.collections.impl.block.function.checked.CheckedFunction2;
 import org.eclipse.collections.impl.list.mutable.FastList;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
+import org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.function.PackageableFunction;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.function.*;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.function.property.Property;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.function.property.PropertyCoreInstanceWrapper;
@@ -324,7 +325,9 @@ public class FunctionExecutionInterpreted implements FunctionExecution
         this.nativeFunctions.put("indexOf_String_1__String_1__Integer_1_", indexOf);
         this.nativeFunctions.put("indexOf_String_1__String_1__Integer_1__Integer_1_", indexOf);
         this.nativeFunctions.put("toOne_T_MANY__T_1_", new ToOne(repository));
+        this.nativeFunctions.put("toOne_T_MANY__String_1__T_1_", new ToOne(repository));
         this.nativeFunctions.put("toOneMany_T_MANY__T_$1_MANY$_", new ToOneMany(repository));
+        this.nativeFunctions.put("toOneMany_T_MANY__String_1__T_$1_MANY$_", new ToOneMany(repository));
         this.nativeFunctions.put("readFile_String_1__String_$0_1$_", new ReadFile(repository, storage));
 
         this.nativeFunctions.put("reverse_T_m__T_m_", new Reverse());
@@ -585,14 +588,17 @@ public class FunctionExecutionInterpreted implements FunctionExecution
                 variableContext.markVariableScopeBoundary();
             }
 
-            for (CoreInstance constraint : function._preConstraints())
+            if (function instanceof PackageableFunction)
             {
-                CoreInstance definition = Instance.getValueForMetaPropertyToOneResolved(Instance.getValueForMetaPropertyToOneResolved(constraint, M3Properties.functionDefinition, processorSupport), M3Properties.expressionSequence, processorSupport);
-                String ruleId = Instance.getValueForMetaPropertyToOneResolved(constraint, M3Properties.name, processorSupport).getName();
-                CoreInstance evaluatedConstraint = this.executeValueSpecification(definition, new Stack<MutableMap<String, CoreInstance>>(), new Stack<MutableMap<String, CoreInstance>>(), null, variableContext, VoidProfiler.VOID_PROFILER, instantiationContext, executionSupport);
-                if ("false".equals(evaluatedConstraint.getValueForMetaPropertyToOne(M3Properties.values).getName()))
+                for (CoreInstance constraint : ((PackageableFunction<CoreInstance>)function)._preConstraints())
                 {
-                    throw new PureExecutionException(functionExpressionToUseInStack == null ? null : functionExpressionToUseInStack.getSourceInformation(), "Constraint (PRE):[" + ruleId + "] violated. (Function:" + function.getName() + ")");
+                    CoreInstance definition = Instance.getValueForMetaPropertyToOneResolved(Instance.getValueForMetaPropertyToOneResolved(constraint, M3Properties.functionDefinition, processorSupport), M3Properties.expressionSequence, processorSupport);
+                    String ruleId = Instance.getValueForMetaPropertyToOneResolved(constraint, M3Properties.name, processorSupport).getName();
+                    CoreInstance evaluatedConstraint = this.executeValueSpecification(definition, new Stack<MutableMap<String, CoreInstance>>(), new Stack<MutableMap<String, CoreInstance>>(), null, variableContext, VoidProfiler.VOID_PROFILER, instantiationContext, executionSupport);
+                    if ("false".equals(evaluatedConstraint.getValueForMetaPropertyToOne(M3Properties.values).getName()))
+                    {
+                        throw new PureExecutionException(functionExpressionToUseInStack == null ? null : functionExpressionToUseInStack.getSourceInformation(), "Constraint (PRE):[" + ruleId + "] violated. (Function:" + function.getName() + ")");
+                    }
                 }
             }
 
@@ -663,30 +669,32 @@ public class FunctionExecutionInterpreted implements FunctionExecution
                 throw new PureExecutionException("Unsupported function for execution");
             }
 
-            if (function._postConstraints().notEmpty())
+            if (function instanceof PackageableFunction)
             {
-                try
+                if (((PackageableFunction<CoreInstance>)function)._postConstraints().notEmpty())
                 {
-                    variableContext.registerValue("return", result);
-                }
-                catch (VariableNameConflictException e)
-                {
-                    throw new PureExecutionException(functionExpressionToUseInStack.getSourceInformation(), e.getMessage(), e);
-                }
-                for (CoreInstance constraint : function._postConstraints())
-                {
-
-                    CoreInstance definition = Instance.getValueForMetaPropertyToOneResolved(Instance.getValueForMetaPropertyToOneResolved(constraint, M3Properties.functionDefinition, processorSupport), M3Properties.expressionSequence, processorSupport);
-                    String ruleId = Instance.getValueForMetaPropertyToOneResolved(constraint, M3Properties.name, processorSupport).getName();
-                    CoreInstance evaluatedConstraint = this.executeValueSpecification(definition, new Stack<MutableMap<String, CoreInstance>>(), new Stack<MutableMap<String, CoreInstance>>(), null, variableContext, VoidProfiler.VOID_PROFILER, instantiationContext, executionSupport);
-
-                    if ("false".equals(evaluatedConstraint.getValueForMetaPropertyToOne(M3Properties.values).getName()))
+                    try
                     {
-                        throw new PureExecutionException(functionExpressionToUseInStack == null ? null : functionExpressionToUseInStack.getSourceInformation(), "Constraint (POST):[" + ruleId + "] violated. (Function:" + function.getName() + ")");
+                        variableContext.registerValue("return", result);
+                    }
+                    catch (VariableNameConflictException e)
+                    {
+                        throw new PureExecutionException(functionExpressionToUseInStack.getSourceInformation(), e.getMessage(), e);
+                    }
+                    for (CoreInstance constraint : ((PackageableFunction<CoreInstance>)function)._postConstraints())
+                    {
+
+                        CoreInstance definition = Instance.getValueForMetaPropertyToOneResolved(Instance.getValueForMetaPropertyToOneResolved(constraint, M3Properties.functionDefinition, processorSupport), M3Properties.expressionSequence, processorSupport);
+                        String ruleId = Instance.getValueForMetaPropertyToOneResolved(constraint, M3Properties.name, processorSupport).getName();
+                        CoreInstance evaluatedConstraint = this.executeValueSpecification(definition, new Stack<MutableMap<String, CoreInstance>>(), new Stack<MutableMap<String, CoreInstance>>(), null, variableContext, VoidProfiler.VOID_PROFILER, instantiationContext, executionSupport);
+
+                        if ("false".equals(evaluatedConstraint.getValueForMetaPropertyToOne(M3Properties.values).getName()))
+                        {
+                            throw new PureExecutionException(functionExpressionToUseInStack == null ? null : functionExpressionToUseInStack.getSourceInformation(), "Constraint (POST):[" + ruleId + "] violated. (Function:" + function.getName() + ")");
+                        }
                     }
                 }
             }
-
             return result;
         }
         catch (PureAssertFailException e)
