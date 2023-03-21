@@ -17,11 +17,12 @@ package org.finos.legend.pure.m3.serialization.grammar.v1;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.list.mutable.FastList;
-import org.finos.legend.pure.m3.AbstractPureTestWithCoreCompiledPlatform;
+import org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.function.NativeFunctionInstance;
+import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m3.serialization.grammar.m3parser.antlr.M3AntlrParser;
 import org.finos.legend.pure.m3.statelistener.StatsStateListener;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -632,14 +633,23 @@ public class TestM3AntlrParser extends AbstractPureTestWithCoreCompiledPlatform
     }
 
     @Test
+    public void testStereotypeOnNativeFunction()
+    {
+        String code =
+                "\n" +
+                "Profile meta::pure::function::dummyProfile\n" +
+                "{\n" +
+                "   stereotypes : [Dummy];" +
+                "}\n" +
+                "native function <<dummyProfile.Dummy>> meta::pure::functions::date::date(year:Integer[1]):Date[1];\n";
+        new M3AntlrParser(null).parse(code, "test", true, 0, this.repository, this.newInstances, this.stateListener, this.context, 0, null);
+        Assert.assertEquals(1, this.newInstances.selectInstancesOf(NativeFunctionInstance.class).getOnly()._stereotypesCoreInstance().size());
+    }
+
+    @Test
     public void testInstanceParsingWithRootPackageReference()
     {
-        String code = "Class meta::pure::functions::lang::KeyValue\n" +
-                "{\n" +
-                "    key : String[1];\n" +
-                "    value : Any[*];\n" +
-                "}" +
-                "^meta::pure::functions::lang::KeyValue(key='pkg', value=::)";
+        String code = "^meta::pure::functions::lang::KeyValue(key='pkg', value=::)";
         new M3AntlrParser(null).parse(code, "test", true, 0, this.repository, this.newInstances, this.stateListener, this.context, 0, null);
     }
 }

@@ -24,39 +24,53 @@ import org.finos.legend.pure.runtime.java.compiled.generation.processors.support
 import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.function.Procedure4;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 public abstract class BaseCompiledExtension implements CompiledExtension
 {
     private final List<StringJavaSource> extraJavaSources;
-    private final List<Native> extraNatives;
+    private final Supplier<? extends List<Native>> extraNatives;
     private final List<Procedure3<CoreInstance, JavaSourceCodeGenerator, ProcessorContext>> extraPackageableElementProcessors;
     private final List<Procedure4<CoreInstance, CoreInstance, ProcessorContext, ProcessorSupport>> extraClassMappingProcessors;
 
-    protected BaseCompiledExtension(List<Native> extraNatives, List<StringJavaSource> extraJavaSources, List<Procedure3<CoreInstance, JavaSourceCodeGenerator, ProcessorContext>> extraPackageableElementProcessors, List<Procedure4<CoreInstance, CoreInstance, ProcessorContext, ProcessorSupport>> extraClassMappingProcessors)
+    private final String relatedRepository;
+
+    protected BaseCompiledExtension(String relatedRepository, Supplier<? extends List<Native>> extraNatives, List<StringJavaSource> extraJavaSources, List<Procedure3<CoreInstance, JavaSourceCodeGenerator, ProcessorContext>> extraPackageableElementProcessors, List<Procedure4<CoreInstance, CoreInstance, ProcessorContext, ProcessorSupport>> extraClassMappingProcessors)
     {
         this.extraNatives = extraNatives;
         this.extraJavaSources = extraJavaSources;
         this.extraPackageableElementProcessors = extraPackageableElementProcessors;
         this.extraClassMappingProcessors = extraClassMappingProcessors;
+        this.relatedRepository = relatedRepository;
     }
 
+    @Override
     public List<StringJavaSource> getExtraJavaSources()
     {
         return this.extraJavaSources;
     }
 
+    @Override
     public List<Native> getExtraNatives()
     {
-        return this.extraNatives;
+        return this.extraNatives.get();
     }
 
+    @Override
     public List<Procedure3<CoreInstance, JavaSourceCodeGenerator, ProcessorContext>> getExtraPackageableElementProcessors()
     {
         return this.extraPackageableElementProcessors;
     }
 
+    @Override
     public List<Procedure4<CoreInstance, CoreInstance, ProcessorContext, ProcessorSupport>> getExtraClassMappingProcessors()
     {
         return this.extraClassMappingProcessors;
+    }
+
+    @Override
+    public String getRelatedRepository()
+    {
+        return this.relatedRepository;
     }
 }

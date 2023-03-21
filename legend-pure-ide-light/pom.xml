@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.finos.legend.pure</groupId>
         <artifactId>legend-pure</artifactId>
-        <version>3.8.2-SNAPSHOT</version>
+        <version>4.3.3-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -32,6 +32,8 @@
 
     <properties>
         <skip.yarn>false</skip.yarn>
+        <pure-ide.web-application.version>9.0.0</pure-ide.web-application.version>
+        <pure-ide.web-application.url>https://registry.npmjs.org/@finos/legend-application-pure-ide-deployment/-/legend-application-pure-ide-deployment-${pure-ide.web-application.version}.tgz</pure-ide.web-application.url>
     </properties>
 
     <build>
@@ -42,41 +44,23 @@
         </resources>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.6.0</version>
+                <groupId>com.googlecode.maven-download-plugin</groupId>
+                <artifactId>download-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>yarn-install</id>
+                        <id>download-web-content</id>
                         <phase>initialize</phase>
-                        <configuration>
-                            <executable>yarn</executable>
-                            <arguments>
-                                <argument>install</argument>
-                            </arguments>
-                            <workingDirectory>src/main/web</workingDirectory>
-                            <skip>${skip.yarn}</skip>
-                        </configuration>
                         <goals>
-                            <goal>exec</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>build-web-application</id>
-                        <phase>generate-resources</phase>
-                        <configuration>
-                            <executable>yarn</executable>
-                            <arguments>
-                                <argument>build:ci</argument>
-                            </arguments>
-                            <workingDirectory>src/main/web</workingDirectory>
-                            <skip>${skip.yarn}</skip>
-                        </configuration>
-                        <goals>
-                            <goal>exec</goal>
+                            <goal>wget</goal>
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <skip>${skip.yarn}</skip>
+                    <url>${pure-ide.web-application.url}</url>
+                    <unpack>true</unpack>
+                    <outputDirectory>${project.build.directory}/web-content</outputDirectory>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -106,7 +90,7 @@
                             <outputDirectory>${project.build.directory}/classes/web</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.basedir}/src/main/web/packages/legend-pure-ide-deployment/dist</directory>
+                                    <directory>${project.build.directory}/web-content/package/dist</directory>
                                 </resource>
                             </resources>
                         </configuration>
@@ -125,14 +109,21 @@
             <groupId>org.finos.legend.pure</groupId>
             <artifactId>legend-pure-m3-core</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.finos.legend.pure</groupId>
-            <artifactId>legend-pure-runtime-java-extension-external-json</artifactId>
+            <artifactId>legend-pure-runtime-java-engine-interpreted</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.finos.legend.pure</groupId>
+            <artifactId>legend-pure-runtime-java-extension-functions-json</artifactId>
         </dependency>
         <dependency>
             <groupId>org.finos.legend.pure</groupId>
             <artifactId>legend-pure-runtime-java-engine-shared</artifactId>
         </dependency>
+
+
         <dependency>
             <groupId>org.finos.legend.pure</groupId>
             <artifactId>legend-pure-runtime-java-extension-store-relational</artifactId>
@@ -140,26 +131,22 @@
         </dependency>
         <dependency>
             <groupId>org.finos.legend.pure</groupId>
-            <artifactId>legend-pure-runtime-java-engine-interpreted</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.finos.legend.pure</groupId>
-            <artifactId>legend-pure-m2-dsl-diagram</artifactId>
+            <artifactId>legend-pure-m2-dsl-diagram-grammar</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.finos.legend.pure</groupId>
-            <artifactId>legend-pure-m2-dsl-mapping</artifactId>
+            <artifactId>legend-pure-m2-dsl-mapping-grammar</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.finos.legend.pure</groupId>
-            <artifactId>legend-pure-m2-external-json</artifactId>
+            <artifactId>legend-pure-m2-functions-json-pure</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.finos.legend.pure</groupId>
-            <artifactId>legend-pure-m2-store-relational</artifactId>
+            <artifactId>legend-pure-m2-store-relational-pure</artifactId>
             <scope>runtime</scope>
         </dependency>
 
@@ -167,6 +154,7 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.eclipse.collections</groupId>
             <artifactId>eclipse-collections</artifactId>

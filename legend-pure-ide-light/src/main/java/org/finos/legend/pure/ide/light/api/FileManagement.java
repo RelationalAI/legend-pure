@@ -19,7 +19,6 @@ import org.eclipse.collections.api.block.predicate.Predicate;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.utility.LazyIterate;
 import org.finos.legend.pure.ide.light.helpers.response.ExceptionTranslation;
-import org.finos.legend.pure.ide.light.helpers.response.IDEResponse;
 import org.finos.legend.pure.ide.light.session.PureSession;
 import org.finos.legend.pure.m3.serialization.filesystem.PureCodeStorage;
 import org.finos.legend.pure.m3.serialization.filesystem.repository.PlatformCodeRepository;
@@ -27,6 +26,7 @@ import org.finos.legend.pure.m3.serialization.filesystem.repository.ScratchCodeR
 import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.CodeStorage;
 import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.CodeStorageNode;
 import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.CodeStorageNodeStatus;
+import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.CodeStorageTools;
 import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.MutableCodeStorage;
 import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.classpath.Version;
 import org.json.simple.JSONObject;
@@ -34,7 +34,10 @@ import org.json.simple.JSONValue;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
@@ -44,18 +47,19 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.regex.Pattern;
 
-@Api(
-        tags = {"File Management"}
-)
+@Api(tags = "File Management")
 @Path("/")
 public class FileManagement
 {
-    private PureSession pureSession;
+    private static final Pattern FILE_NAME_PATTERN = Pattern.compile("/?+(\\w+/)*+\\w+(\\.\\w++)*+");
 
-    public FileManagement(PureSession pureSession)
+    private final PureSession session;
+
+    public FileManagement(PureSession session)
     {
-        this.pureSession = pureSession;
+        this.session = session;
     }
 
 
@@ -77,79 +81,123 @@ public class FileManagement
         }
     };
 
-    @GET
+    @DELETE
     @Path("deleteFile/{filePath:.+}")
     public Response deleteFile(@PathParam("filePath") String filePath, @Context HttpServletRequest request, @Context HttpServletResponse response)
     {
-        return Response.ok((StreamingOutput) outStream ->
+        try
         {
-            try
+            session.getPureRuntime().delete("/" + filePath);
+            return Response.ok((StreamingOutput) outputStream ->
             {
-                pureSession.getPureRuntime().delete("/"+filePath);
-                outStream.write(("{\"cached\":"+false+"}").getBytes());
-                outStream.close();
-            }
-            catch (RuntimeException e)
+                outputStream.write(("{\"cached\":" + false + "}").getBytes());
+                outputStream.close();
+            }).build();
+        }
+        catch (Exception e)
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity((StreamingOutput) outputStream ->
             {
-                IDEResponse exceptionResponse = ExceptionTranslation.buildExceptionMessage(pureSession, e, new ByteArrayOutputStream());
-                outStream.write(JSONValue.escape("\n" + exceptionResponse.getText()).getBytes());
-                outStream.write("\"".getBytes());
-            }
-        }).build();
+                outputStream.write(("\"" + JSONValue.escape(ExceptionTranslation.buildExceptionMessage(session, e, new ByteArrayOutputStream()).getText()) + "\"").getBytes());
+                outputStream.close();
+            }).build();
+        }
     }
 
-    @GET
+    @POST
     @Path("newFile/{filePath:.+}")
     public Response newFile(@PathParam("filePath") String filePath, @Context HttpServletRequest request, @Context HttpServletResponse response)
     {
-        return Response.ok((StreamingOutput) outStream ->
+        try
         {
-            try
+            session.getPureRuntime().create("/" + filePath);
+
+            return Response.ok((StreamingOutput) outputStream ->
             {
-                pureSession.getPureRuntime().create("/"+filePath);
-                outStream.write(("{\"cached\":"+false+"}").getBytes());
-                outStream.close();
-            }
-            catch (RuntimeException e)
+                outputStream.write(("{\"cached\":" + false + "}").getBytes());
+                outputStream.close();
+            }).build();
+        }
+        catch (Exception e)
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity((StreamingOutput) outputStream ->
             {
-                IDEResponse exceptionResponse = ExceptionTranslation.buildExceptionMessage(pureSession, e, new ByteArrayOutputStream());
-                outStream.write(JSONValue.escape("\n" + exceptionResponse.getText()).getBytes());
-                outStream.write("\"".getBytes());
-            }
-        }).build();
+                outputStream.write(("\"" + JSONValue.escape(ExceptionTranslation.buildExceptionMessage(session, e, new ByteArrayOutputStream()).getText()) + "\"").getBytes());
+                outputStream.close();
+            }).build();
+        }
     }
 
-    @GET
+    @POST
     @Path("newFolder/{filePath:.+}")
     public Response newFolder(@PathParam("filePath") String filePath, @Context HttpServletRequest request, @Context HttpServletResponse response)
     {
-        return Response.ok((StreamingOutput) outStream ->
+        try
         {
-            try
+            session.getCodeStorage().createFolder("/" + filePath);
+
+            return Response.ok((StreamingOutput) outputStream ->
             {
-                pureSession.getCodeStorage().createFolder("/"+filePath);
-                outStream.write(("{\"cached\":"+false+"}").getBytes());
-                outStream.close();
-            }
-            catch (RuntimeException e)
+                outputStream.write(("{\"cached\":" + false + "}").getBytes());
+                outputStream.close();
+            }).build();
+        }
+        catch (Exception e)
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity((StreamingOutput) outputStream ->
             {
-                IDEResponse exceptionResponse = ExceptionTranslation.buildExceptionMessage(pureSession, e, new ByteArrayOutputStream());
-                outStream.write(JSONValue.escape("\n" + exceptionResponse.getText()).getBytes());
-                outStream.write("\"".getBytes());
+                outputStream.write(("\"" + JSONValue.escape(ExceptionTranslation.buildExceptionMessage(session, e, new ByteArrayOutputStream()).getText()) + "\"").getBytes());
+                outputStream.close();
+            }).build();
+        }
+    }
+
+    @PUT
+    @Path("renameFile")
+    public Response renameFile(RenameFileInput input, @Context HttpServletRequest request, @Context HttpServletResponse response)
+    {
+        try
+        {
+            String oldPath = input.oldPath;
+            String newPath = input.newPath;
+
+            if (oldPath == null || !FILE_NAME_PATTERN.matcher(oldPath).matches())
+            {
+                throw new IllegalArgumentException("Invalid old path");
             }
-        }).build();
+            if (newPath == null || !FILE_NAME_PATTERN.matcher(newPath).matches())
+            {
+                throw new IllegalArgumentException("Invalid new path");
+            }
+
+            this.session.getPureRuntime().move(oldPath, newPath);
+
+            return Response.ok((StreamingOutput) outputStream ->
+            {
+                outputStream.write(("{\"oldPath\":\"" + JSONValue.escape(oldPath) + "\",\"newPath\":\"" + JSONObject.escape(newPath) + "\"}").getBytes());
+                outputStream.close();
+            }).build();
+        }
+        catch (Exception e)
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity((StreamingOutput) outputStream ->
+            {
+                outputStream.write(("\"" + JSONValue.escape(ExceptionTranslation.buildExceptionMessage(session, e, new ByteArrayOutputStream()).getText()) + "\"").getBytes());
+                outputStream.close();
+            }).build();
+        }
     }
 
     @GET
     @Path("dir")
     public Response dir(@Context HttpServletRequest request, @Context HttpServletResponse response)
     {
-        return Response.ok((StreamingOutput) outStream ->
+        try
         {
             response.setContentType("application/json");
             String path = request.getParameter("parameters");
             StringBuilder json = new StringBuilder("[");
-            MutableList<CodeStorageNode> nodes = LazyIterate.reject(pureSession.getCodeStorage().getFiles(path), IGNORED_NODE).toSortedList(NODE_COMPARATOR);
+            MutableList<CodeStorageNode> nodes = LazyIterate.reject(session.getCodeStorage().getFiles(path), IGNORED_NODE).toSortedList(NODE_COMPARATOR);
             if ("/".equals(path))
             {
                 nodes.sortThis((o1, o2) ->
@@ -162,7 +210,7 @@ public class FileManagement
             ;
             if (nodes.notEmpty())
             {
-                MutableCodeStorage codeStorage = pureSession.getCodeStorage();
+                MutableCodeStorage codeStorage = session.getCodeStorage();
                 Iterator<CodeStorageNode> iterator = nodes.iterator();
                 writeNode(json, codeStorage, path, iterator.next());
                 while (iterator.hasNext())
@@ -172,19 +220,30 @@ public class FileManagement
                 }
             }
             json.append(']');
-            outStream.write(json.toString().getBytes(), 0, json.length());
-            outStream.close();
 
-        }).build();
+            return Response.ok((StreamingOutput) outputStream ->
+            {
+                outputStream.write(json.toString().getBytes(), 0, json.length());
+                outputStream.close();
+            }).build();
+        }
+        catch (Exception e)
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity((StreamingOutput) outputStream ->
+            {
+                outputStream.write(("\"" + JSONValue.escape(ExceptionTranslation.buildExceptionMessage(session, e, new ByteArrayOutputStream()).getText()) + "\"").getBytes());
+                outputStream.close();
+            }).build();
+        }
     }
 
     @GET
     @Path("fileAsJson/{filePath:.+}")
     public Response fileAsJson(@PathParam("filePath") String filePath)
     {
-        return Response.ok((StreamingOutput) outStream ->
+        try
         {
-            CodeStorage codeStorage = pureSession.getCodeStorage();
+            MutableCodeStorage codeStorage = session.getCodeStorage();
             if (codeStorage == null)
             {
                 throw new RuntimeException("Cannot find code storage");
@@ -193,7 +252,8 @@ public class FileManagement
             try
             {
                 content = codeStorage.getContentAsBytes(filePath);
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 StringBuilder message = new StringBuilder("Error accessing resource \"");
                 message.append(filePath);
@@ -209,18 +269,30 @@ public class FileManagement
             {
                 throw new IOException("Could not find resource \"" + filePath + "\"");
             }
-            outStream.write(this.transformContent(content));
-            outStream.close();
-        }).build();
+
+            return Response.ok((StreamingOutput) outputStream ->
+            {
+                outputStream.write(this.transformContent(content, codeStorage.isRepositoryImmutable(codeStorage.getRepositoryForPath(filePath))));
+                outputStream.close();
+            }).build();
+        }
+        catch (Exception e)
+        {
+            return Response.status(Response.Status.BAD_REQUEST).entity((StreamingOutput) outputStream ->
+            {
+                outputStream.write(("\"" + JSONValue.escape(ExceptionTranslation.buildExceptionMessage(session, e, new ByteArrayOutputStream()).getText()) + "\"").getBytes());
+                outputStream.close();
+            }).build();
+        }
     }
 
-    private byte[] transformContent(byte[] content)
+    private byte[] transformContent(byte[] content, boolean isImmutable)
     {
         JSONObject object = new JSONObject();
         object.put("content", new String(content));
+        object.put("RO", isImmutable);
         return object.toJSONString().getBytes();
     }
-
 
     private void writeNode(StringBuilder builder, MutableCodeStorage codeStorage, String path, CodeStorageNode node)
     {
@@ -233,7 +305,7 @@ public class FileManagement
             }
             else
             {
-                writeDirectoryNode(builder, fullPath, node);
+                writeDirectoryNode(builder, fullPath, codeStorage, node);
             }
         }
         else
@@ -248,7 +320,9 @@ public class FileManagement
         String repoName = codeStorage.getRepoName(path);
         builder.append("{\"li_attr\":{\"id\":\"file_");
         builder.append(path);
-        builder.append("\",\"path\":\"" + path + "\",\"file\":\"false\",\"repo\":\"true\"},\"text\":\"");
+        builder.append("\",\"path\":\"").append(path).append("\",\"file\":false,\"repo\":true");
+        builder.append(",\"RO\":").append(codeStorage.isRepositoryImmutable(codeStorage.getRepositoryForPath(path)));
+        builder.append("},\"text\":\"");
         builder.append(repo.getName());
         if (currentRevision >= 0)
         {
@@ -260,7 +334,6 @@ public class FileManagement
             builder.append(Version.SERVER);
             builder.append(')');
             builder.append("\",\"icon\":\"/ide/pure/icons/wrench.png\",\"state\":\"closed\",\"children\":true}");
-
         }
         else
         {
@@ -268,34 +341,40 @@ public class FileManagement
         }
     }
 
-    private void writeDirectoryNode(StringBuilder builder, String path, CodeStorageNode directory)
+    private void writeDirectoryNode(StringBuilder builder, String path, MutableCodeStorage codeStorage, CodeStorageNode directory)
     {
         builder.append("{\"li_attr\":{\"id\":\"file_");
         builder.append(path);
-        builder.append("\",\"path\":\"").append(path).append("\",\"file\":\"false\"},\"text\":\"");
+        builder.append("\",\"path\":\"").append(path).append("\",\"file\":false");
+        builder.append(",\"RO\":").append(codeStorage.isRepositoryImmutable(codeStorage.getRepositoryForPath(path)));
+        builder.append("},\"text\":\"");
         builder.append(directory.getName());
-        builder.append("\",\"state\":\"closed\",\"children\":true}");
+        builder.append("\",\"state\":\"closed\",\"children\":").append(!codeStorage.isEmptyFolder(path)).append("}");
     }
 
     private void writeFileNode(StringBuilder builder, MutableCodeStorage codeStorage, String path, CodeStorageNode file)
     {
         builder.append("{\"li_attr\":{\"id\":\"file_");
         builder.append(path);
-        builder.append("\",\"path\":\"").append(path).append("\",\"file\":\"true\"");
+        builder.append("\",\"path\":\"").append(path).append("\",\"file\":true");
+        builder.append(",\"RO\":").append(codeStorage.isRepositoryImmutable(codeStorage.getRepositoryForPath(path)));
 
-        if (PlatformCodeRepository.NAME.equals(codeStorage.getRepoName(path)))
-        {
-            builder.append(",\"RO\":\"true\""); // TODO can we replace this with an actual boolean?
-        }
-        else if (file.getStatus() != CodeStorageNodeStatus.NORMAL)
+        if (file.getStatus() != CodeStorageNodeStatus.NORMAL)
         {
             builder.append(",\"statusType\":\"");
             builder.append(file.getStatus());
             builder.append('"');
         }
+
         builder.append("},\"text\":\"");
         builder.append(file.getName());
         builder.append("\",\"icon\":\"/ide/pure/icons/filesystem/txt.png\"}");
     }
 
+
+    public static class RenameFileInput
+    {
+        public String oldPath;
+        public String newPath;
+    }
 }
