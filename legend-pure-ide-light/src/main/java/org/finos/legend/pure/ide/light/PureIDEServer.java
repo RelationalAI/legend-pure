@@ -24,25 +24,31 @@ import io.federecio.dropwizard.swagger.SwaggerResource;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.finos.legend.pure.ide.light.api.Activities;
+import org.finos.legend.pure.ide.light.api.Suggestion;
 import org.finos.legend.pure.ide.light.api.FileManagement;
 import org.finos.legend.pure.ide.light.api.LifeCycle;
 import org.finos.legend.pure.ide.light.api.Service;
 import org.finos.legend.pure.ide.light.api.concept.Concept;
+import org.finos.legend.pure.ide.light.api.concept.MovePackageableElements;
+import org.finos.legend.pure.ide.light.api.concept.RenameConcept;
 import org.finos.legend.pure.ide.light.api.execution.function.Execute;
 import org.finos.legend.pure.ide.light.api.execution.go.ExecuteGo;
 import org.finos.legend.pure.ide.light.api.execution.test.ExecuteTests;
 import org.finos.legend.pure.ide.light.api.find.FindInSources;
 import org.finos.legend.pure.ide.light.api.find.FindPureFile;
+import org.finos.legend.pure.ide.light.api.find.FindTextPreview;
+import org.finos.legend.pure.ide.light.api.source.UpdateSource;
 import org.finos.legend.pure.ide.light.session.PureSession;
 import org.finos.legend.pure.m3.serialization.filesystem.repository.CodeRepository;
 import org.finos.legend.pure.m3.serialization.filesystem.repository.CodeRepositoryProviderHelper;
-import org.finos.legend.pure.m3.serialization.filesystem.repository.CodeRepositorySet;
 import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.RepositoryCodeStorage;
 import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.classpath.ClassLoaderCodeStorage;
 
-import java.util.EnumSet;
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
 
 public abstract class PureIDEServer extends Application<ServerConfiguration>
 {
@@ -78,6 +84,8 @@ public abstract class PureIDEServer extends Application<ServerConfiguration>
         this.pureSession = new PureSession(configuration.sourceLocationConfiguration, this.getRepositories(configuration.sourceLocationConfiguration));
 
         environment.jersey().register(new Concept(pureSession));
+        environment.jersey().register(new RenameConcept(pureSession));
+        environment.jersey().register(new MovePackageableElements(pureSession));
 
         environment.jersey().register(new Execute(pureSession));
         environment.jersey().register(new ExecuteGo(pureSession));
@@ -85,10 +93,15 @@ public abstract class PureIDEServer extends Application<ServerConfiguration>
 
         environment.jersey().register(new FindInSources(pureSession));
         environment.jersey().register(new FindPureFile(pureSession));
+        environment.jersey().register(new FindTextPreview((pureSession)));
+
+        environment.jersey().register(new UpdateSource(pureSession));
 
         environment.jersey().register(new Activities(pureSession));
         environment.jersey().register(new FileManagement(pureSession));
         environment.jersey().register(new LifeCycle(pureSession));
+
+        environment.jersey().register(new Suggestion(pureSession));
 
         environment.jersey().register(new Service(pureSession));
 
@@ -115,13 +128,12 @@ public abstract class PureIDEServer extends Application<ServerConfiguration>
     private MutableList<RepositoryCodeStorage> getRepositories(SourceLocationConfiguration sourceLocationConfiguration)
     {
         MutableList<RepositoryCodeStorage> fromIde = this.buildRepositories(sourceLocationConfiguration);
-
-        CodeRepositorySet repositorySet = CodeRepositorySet.newBuilder()
-                .withCodeRepositories(CodeRepositoryProviderHelper.findCodeRepositories())
-                .withoutCodeRepositories(fromIde.asLazy().flatCollect(RepositoryCodeStorage::getRepositories).collect(CodeRepository::getName))
-                .build();
-
-        return fromIde.with(new ClassLoaderCodeStorage(repositorySet.getRepositories()));
+        Set<String> fromIdeName = fromIde.flatCollect(RepositoryCodeStorage::getRepositories).collect(CodeRepository::getName).toSet();
+        List<CodeRepository> fromClasspath = CodeRepositoryProviderHelper.findCodeRepositories()
+                .toList()
+                .with(CodeRepository.newPlatformCodeRepository())
+                .reject(x -> fromIdeName.contains(x.getName()));
+        return fromIde.with(new ClassLoaderCodeStorage(fromClasspath));
     }
 
     public PureSession getPureSession()
