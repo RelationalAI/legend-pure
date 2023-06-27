@@ -219,6 +219,9 @@ public class RAIExecute extends NativeFunction {
                                     )
                             );
                             break;
+                        case "Bool":
+                            pValues.add(repository.newBooleanCoreInstance((Boolean) value));
+                            break;
                         default:
                             throw new PureExecutionException(String.format("Encountered value of unknown type `%s` while retrieving results.", type));
                     }
