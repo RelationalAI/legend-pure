@@ -37,6 +37,7 @@ public class RAIExecute extends NativeFunction {
 
     private static final String PURE_RAI_RESULT = "meta::rel::execute::RAIResult";
     private static final String PURE_COLUMN = "meta::rel::execute::Column";
+    private static final String PURE_ROW = "meta::rel::execute::Row";
     private static final String PURE_OUTPUT = "meta::rel::execute::Output";
     private static final String PURE_PROBLEM = "meta::rel::execute::Problem";
     private static final String PURE_REL_KEY = "meta::rel::execute::RelKey";
@@ -81,6 +82,113 @@ public class RAIExecute extends NativeFunction {
         }
 
         return ret;
+    }
+
+    private CoreInstance relValueToPureValue(Object value, String relType) {
+        switch (relType) {
+            case "Int64":
+                /*values[j] instanceof Integer*/
+                // TODO(gbrgr): this is only a hotfix to support integers (https://github.com/RelationalAI/rai-sdk-java/issues/4)
+                return repository.newIntegerCoreInstance(((Double) value).intValue());
+            case "String":
+            case "RelationalAITypes.HashValue":
+                /*values[j] instanceof String*/
+                return repository.newStringCoreInstance((String) value);
+            case "Float64":
+                /*values[j] instanceof Double*/
+                return repository.newFloatCoreInstance(BigDecimal.valueOf((Double) value));
+            case "Dates.DateTime":
+                DateTimeFormatter format = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss");
+                DateTime time = format.parseDateTime((String)value);
+                return repository.newDateCoreInstance(
+                                DateFunctions.newPureDate(
+                                        time.getYear(),
+                                        time.getMonthOfYear(),
+                                        time.getDayOfMonth(),
+                                        time.getHourOfDay(),
+                                        time.getMinuteOfHour(),
+                                        time.getSecondOfMinute()
+                                )
+                        );
+            case "Dates.Date":
+                format = DateTimeFormat.forPattern("yyyy-MM-dd");
+                time = format.parseDateTime((String)value);
+                return repository.newDateCoreInstance(
+                                DateFunctions.newPureDate(
+                                        time.getYear(),
+                                        time.getMonthOfYear(),
+                                        time.getDayOfMonth()
+                                )
+                        );
+            case "Bool":
+                return repository.newBooleanCoreInstance((Boolean) value);
+            default:
+                throw new PureExecutionException(String.format("Encountered value of unknown type `%s` while retrieving results.", relType));
+        }
+    }
+
+    private MutableList<CoreInstance> columnsToInstances(
+            Object[][] columns,
+            String pureType,
+            CoreInstance functionExpressionToUseInStack,
+            ProcessorSupport processorSupport,
+            RelKey relKey
+    ) {
+        int offset = relKey.keys.length + relKey.values.length - columns.length;
+        MutableList<CoreInstance> pColumns = FastList.newList();
+
+        for (int i = 0; i < columns.length && offset >= 0; i++) {
+            Object[] values = columns[i];
+            MutableList<CoreInstance> pValues = FastList.newList();
+
+            CoreInstance pColumn = this.instance(pureType, functionExpressionToUseInStack, processorSupport);
+
+            int typeIndex = offset + i;
+            String type;
+            if (typeIndex < relKey.keys.length)
+                type = relKey.keys[typeIndex];
+            else
+                type = relKey.values[typeIndex - relKey.keys.length];
+
+            for (Object value : values) {
+                pValues.add(relValueToPureValue(value, type));
+            }
+
+            Instance.setValuesForProperty(pColumn, "values", pValues, processorSupport);
+            pColumns.add(pColumn);
+        }
+        return pColumns;
+    }
+
+    private MutableList<CoreInstance> rowsToInstances(
+            Object[][] rows,
+            String pureType,
+            CoreInstance functionExpressionToUseInStack,
+            ProcessorSupport processorSupport,
+            RelKey relKey
+    ) {
+        MutableList<CoreInstance> pRows = FastList.newList();
+
+        for (int i = 0; i < rows.length; i++) {
+            MutableList<CoreInstance> pValues = FastList.newList();
+            CoreInstance pRow = this.instance(pureType, functionExpressionToUseInStack, processorSupport);
+
+            for (int j = 0; j < rows[i].length; j++) {
+                int offset = relKey.keys.length + relKey.values.length - rows[i].length;
+                int typeIndex = offset + j;
+                String type;
+                if (typeIndex < relKey.keys.length)
+                    type = relKey.keys[typeIndex];
+                else
+                    type = relKey.values[typeIndex - relKey.keys.length];
+
+                pValues.add(relValueToPureValue(rows[i][j], type));
+            }
+
+            Instance.setValuesForProperty(pRow, "values", pValues, processorSupport);
+            pRows.add(pRow);
+        }
+        return pRows;
     }
 
     private CoreInstance doExecute(
@@ -156,82 +264,32 @@ public class RAIExecute extends NativeFunction {
 
             Instance.setValueForProperty(pOutput, "relKey", pRelKey, processorSupport);
 
-            int offset = output.relKey.keys.length + output.relKey.values.length - output.columns.length;
 
-            Object[][] columns = output.columns;
-            MutableList<CoreInstance> pColumns = FastList.newList();
-            for (int i = 0; i < columns.length && offset >= 0; i++) {
-                Object[] values = columns[i];
-                MutableList<CoreInstance> pValues = FastList.newList();
+            MutableList<CoreInstance> pColumns = columnsToInstances(
+                    output.columns,
+                    PURE_COLUMN,
+                    functionExpressionToUseInStack,
+                    processorSupport,
+                    output.relKey
+            );
 
-                CoreInstance pColumn = this.instance(PURE_COLUMN, functionExpressionToUseInStack, processorSupport);
-
-                int typeIndex = offset + i;
-                String type;
-                if (typeIndex < output.relKey.keys.length)
-                    type = output.relKey.keys[typeIndex];
-                else
-                    type = output.relKey.values[typeIndex - output.relKey.keys.length];
-
-                for (Object value : values) {
-                    switch (type) {
-                        case "Int64":
-                            /*values[j] instanceof Integer*/
-                            // TODO(gbrgr): this is only a hotfix to support integers (https://github.com/RelationalAI/rai-sdk-java/issues/4)
-                            pValues.add(repository.newIntegerCoreInstance(((Double) value).intValue()));
-                            break;
-                        case "String":
-                        case "RelationalAITypes.HashValue":
-                            /*values[j] instanceof String*/
-                            pValues.add(repository.newStringCoreInstance((String) value));
-                            break;
-                        case "Float64":
-                            /*values[j] instanceof Double*/
-                            pValues.add(repository.newFloatCoreInstance(BigDecimal.valueOf((Double) value)));
-                            break;
-                        case "Dates.DateTime":
-                            DateTimeFormatter format = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss");
-                            DateTime time = format.parseDateTime((String)value);
-
-                            pValues.add(
-                                    repository.newDateCoreInstance(
-                                            DateFunctions.newPureDate(
-                                                    time.getYear(),
-                                                    time.getMonthOfYear(),
-                                                    time.getDayOfMonth(),
-                                                    time.getHourOfDay(),
-                                                    time.getMinuteOfHour(),
-                                                    time.getSecondOfMinute()
-                                            )
-                                    )
-                            );
-                            break;
-                        case "Dates.Date":
-                            format = DateTimeFormat.forPattern("yyyy-MM-dd");
-                            time = format.parseDateTime((String)value);
-                            pValues.add(
-                                    repository.newDateCoreInstance(
-                                            DateFunctions.newPureDate(
-                                                    time.getYear(),
-                                                    time.getMonthOfYear(),
-                                                    time.getDayOfMonth()
-                                            )
-                                    )
-                            );
-                            break;
-                        case "Bool":
-                            pValues.add(repository.newBooleanCoreInstance((Boolean) value));
-                            break;
-                        default:
-                            throw new PureExecutionException(String.format("Encountered value of unknown type `%s` while retrieving results.", type));
-                    }
+            Object[][] rows = new Object[output.columns[0].length][output.columns.length];
+            for (int i = 0; i < rows.length; i++) {
+                for (int j = 0; j < rows[i].length; j++) {
+                    rows[i][j] = output.columns[j][i];
                 }
-
-                Instance.setValuesForProperty(pColumn, "values", pValues, processorSupport);
-                pColumns.add(pColumn);
             }
 
+            MutableList<CoreInstance> pRows = rowsToInstances(
+                    rows,
+                    PURE_ROW,
+                    functionExpressionToUseInStack,
+                    processorSupport,
+                    output.relKey
+            );
+
             Instance.setValuesForProperty(pOutput, "columns", pColumns, processorSupport);
+            Instance.setValuesForProperty(pOutput, "rows", pRows, processorSupport);
             Instance.addValueToProperty(pResult, "output", pOutput, processorSupport);
         }
 
