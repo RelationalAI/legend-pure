@@ -1,3 +1,17 @@
+// Copyright 2023 Goldman Sachs
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package org.finos.legend.pure.runtime.java.extension.store.rai.interpreted.natives;
 
 import org.eclipse.collections.api.list.ListIterable;
@@ -32,7 +46,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Stack;
 
 
-public class RAIExecute extends NativeFunction {
+public class RAIExecute extends NativeFunction
+{
     private final ModelRepository repository;
 
     private static final String PURE_RAI_RESULT = "meta::rel::execute::RAIResult";
@@ -42,7 +57,8 @@ public class RAIExecute extends NativeFunction {
     private static final String PURE_PROBLEM = "meta::rel::execute::Problem";
     private static final String PURE_REL_KEY = "meta::rel::execute::RelKey";
 
-    public RAIExecute(ModelRepository repository, Message message) {
+    public RAIExecute(ModelRepository repository, Message message)
+    {
         this.repository = repository;
     }
 
@@ -58,7 +74,8 @@ public class RAIExecute extends NativeFunction {
             ExecutionSupport executionSupport,
             Context context,
             ProcessorSupport processorSupport
-    ) throws PureExecutionException {
+    ) throws PureExecutionException
+    {
         CoreInstance connection = Instance.getValueForMetaPropertyToOneResolved(params.get(0), M3Properties.values, processorSupport);
         String source = Instance.getValueForMetaPropertyToOneResolved(params.get(1), M3Properties.values, processorSupport).getName();
 
@@ -68,24 +85,29 @@ public class RAIExecute extends NativeFunction {
         return ValueSpecificationBootstrap.wrapValueSpecification(pureResult, true, processorSupport);
     }
 
-    private CoreInstance instance(String userPath, CoreInstance functionExpressionToUseInStack, ProcessorSupport processorSupport) {
+    private CoreInstance instance(String userPath, CoreInstance functionExpressionToUseInStack, ProcessorSupport processorSupport)
+    {
         return this.repository.newAnonymousCoreInstance(
                 functionExpressionToUseInStack.getSourceInformation(),
                 processorSupport.package_getByUserPath(userPath)
         );
     }
 
-    private FastList<CoreInstance> stringInstances(String[] values) {
+    private FastList<CoreInstance> stringInstances(String[] values)
+    {
         FastList<CoreInstance> ret = FastList.newList(values.length);
-        for (String value : values) {
+        for (String value : values)
+        {
             ret.add(this.repository.newStringCoreInstance(value));
         }
 
         return ret;
     }
 
-    private CoreInstance relValueToPureValue(Object value, String relType) {
-        switch (relType) {
+    private CoreInstance relValueToPureValue(Object value, String relType)
+    {
+        switch (relType)
+        {
             case "Int64":
                 /*values[j] instanceof Integer*/
                 // TODO(gbrgr): this is only a hotfix to support integers (https://github.com/RelationalAI/rai-sdk-java/issues/4)
@@ -127,17 +149,13 @@ public class RAIExecute extends NativeFunction {
         }
     }
 
-    private MutableList<CoreInstance> columnsToInstances(
-            Object[][] columns,
-            String pureType,
-            CoreInstance functionExpressionToUseInStack,
-            ProcessorSupport processorSupport,
-            RelKey relKey
-    ) {
+    private MutableList<CoreInstance> columnsToInstances(Object[][] columns, String pureType, CoreInstance functionExpressionToUseInStack, ProcessorSupport processorSupport, RelKey relKey)
+    {
         int offset = relKey.keys.length + relKey.values.length - columns.length;
         MutableList<CoreInstance> pColumns = FastList.newList();
 
-        for (int i = 0; i < columns.length && offset >= 0; i++) {
+        for (int i = 0; i < columns.length && offset >= 0; i++)
+        {
             Object[] values = columns[i];
             MutableList<CoreInstance> pValues = FastList.newList();
 
@@ -146,11 +164,16 @@ public class RAIExecute extends NativeFunction {
             int typeIndex = offset + i;
             String type;
             if (typeIndex < relKey.keys.length)
+            {
                 type = relKey.keys[typeIndex];
+            }
             else
+            {
                 type = relKey.values[typeIndex - relKey.keys.length];
+            }
 
-            for (Object value : values) {
+            for (Object value : values)
+            {
                 pValues.add(relValueToPureValue(value, type));
             }
 
@@ -160,27 +183,28 @@ public class RAIExecute extends NativeFunction {
         return pColumns;
     }
 
-    private MutableList<CoreInstance> rowsToInstances(
-            Object[][] rows,
-            String pureType,
-            CoreInstance functionExpressionToUseInStack,
-            ProcessorSupport processorSupport,
-            RelKey relKey
-    ) {
+    private MutableList<CoreInstance> rowsToInstances(Object[][] rows, String pureType, CoreInstance functionExpressionToUseInStack, ProcessorSupport processorSupport, RelKey relKey)
+    {
         MutableList<CoreInstance> pRows = FastList.newList();
 
-        for (int i = 0; i < rows.length; i++) {
+        for (int i = 0; i < rows.length; i++)
+        {
             MutableList<CoreInstance> pValues = FastList.newList();
             CoreInstance pRow = this.instance(pureType, functionExpressionToUseInStack, processorSupport);
 
-            for (int j = 0; j < rows[i].length; j++) {
+            for (int j = 0; j < rows[i].length; j++)
+            {
                 int offset = relKey.keys.length + relKey.values.length - rows[i].length;
                 int typeIndex = offset + j;
                 String type;
                 if (typeIndex < relKey.keys.length)
+                {
                     type = relKey.keys[typeIndex];
+                }
                 else
+                {
                     type = relKey.values[typeIndex - relKey.keys.length];
+                }
 
                 pValues.add(relValueToPureValue(rows[i][j], type));
             }
@@ -191,12 +215,8 @@ public class RAIExecute extends NativeFunction {
         return pRows;
     }
 
-    private CoreInstance doExecute(
-            CoreInstance connection,
-            String source,
-            CoreInstance functionExpressionToUseInStack,
-            ProcessorSupport processorSupport
-    ) {
+    private CoreInstance doExecute(CoreInstance connection, String source, CoreInstance functionExpressionToUseInStack, ProcessorSupport processorSupport)
+    {
         CoreInstance pResult = this.instance(PURE_RAI_RESULT, functionExpressionToUseInStack, processorSupport);
 
         String host = Instance.getValueForMetaPropertyToOneResolved(connection, "host", processorSupport).getName();
@@ -215,32 +235,44 @@ public class RAIExecute extends NativeFunction {
         String clientCredentialsURL = iClientCredentialsURL == null ? null : iClientCredentialsURL.getName();
 
         Config config;
-        try {
+        try
+        {
             String contents = String.format("[default]\nhost = %s\nport = %s\nscheme = %s", host, port, scheme);
-            if (clientCredentials != null) {
+            if (clientCredentials != null)
+            {
                 contents = String.format("%s\nclient_id = %s\nclient_secret = %s", contents, clientId, clientSecret);
 
                 if (clientCredentialsURL != null)
+                {
                     contents = String.format("%s\nclient_credentials_url = %s", contents, clientCredentialsURL);
+                }
             }
 
             config = Config.loadConfig(new ByteArrayInputStream(contents.getBytes(StandardCharsets.UTF_8)));
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             throw new PureExecutionException(e.getMessage());
         }
 
         Client client = new Client(config);
         TransactionResult response;
-        try {
+        try
+        {
             response = client.executeV1(database, engine, source, false);
-        } catch (HttpError e) {
+        }
+        catch (HttpError e)
+        {
             throw new PureExecutionException(functionExpressionToUseInStack.getSourceInformation(), e.toString(), e);
-        } catch (InterruptedException | IOException e) {
+        }
+        catch (InterruptedException | IOException e)
+        {
             throw new PureExecutionException(functionExpressionToUseInStack.getSourceInformation(), e.getMessage(), e);
         }
 
         MutableList<CoreInstance> pProblems = FastList.newList(response.problems.length);
-        for (int i = 0; i < response.problems.length; i++) {
+        for (int i = 0; i < response.problems.length; i++)
+        {
             CoreInstance pProblem = this.instance(PURE_PROBLEM, functionExpressionToUseInStack, processorSupport);
             Instance.setValueForProperty(pProblem, "type", repository.newStringCoreInstance(response.problems[i].type), processorSupport);
             Instance.setValueForProperty(pProblem, "message", repository.newStringCoreInstance(response.problems[i].message), processorSupport);
@@ -253,7 +285,8 @@ public class RAIExecute extends NativeFunction {
 
         Instance.setValuesForProperty(pResult, "problems", pProblems, processorSupport);
 
-        for (int k = 0; k < response.output.length; k++) {
+        for (int k = 0; k < response.output.length; k++)
+        {
             Relation output = response.output[k];
             CoreInstance pOutput = this.instance(PURE_OUTPUT, functionExpressionToUseInStack, processorSupport);
 
@@ -274,8 +307,10 @@ public class RAIExecute extends NativeFunction {
             );
 
             Object[][] rows = new Object[output.columns[0].length][output.columns.length];
-            for (int i = 0; i < rows.length; i++) {
-                for (int j = 0; j < rows[i].length; j++) {
+            for (int i = 0; i < rows.length; i++)
+            {
+                for (int j = 0; j < rows[i].length; j++)
+                {
                     rows[i][j] = output.columns[j][i];
                 }
             }
