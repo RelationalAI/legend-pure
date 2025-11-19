@@ -66,7 +66,7 @@
         <commons-lang.version>3.5</commons-lang.version>
         <commons-text.version>1.10.0</commons-text.version>
         <eclipsecollections.version>10.2.0</eclipsecollections.version>
-        <guava.version>30.0-jre</guava.version>
+        <guava.version>32.0.0-jre</guava.version>
         <h2.version>2.1.214</h2.version>
         <jackson.version>2.10.5</jackson.version>
         <jackson.databind.version>2.10.5.1</jackson.databind.version>
